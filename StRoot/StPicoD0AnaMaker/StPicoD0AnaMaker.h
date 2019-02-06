@@ -3,15 +3,18 @@
 
 #include "StPicoHFMaker/StPicoHFMaker.h"
 #include "TNtuple.h"
+<<<<<<< HEAD
 #include "TProfile.h"
+=======
+#include "TVector3.h"
+
+>>>>>>> f6b502a69ce0930c336534a90b74d11c6b2ffcaf
 //#include "StRefMultCorr/StRefMultCorr.h"
 #include "TH2F.h"
 //#include "StPicoD0AnaHists.h"
 #include <vector>
 #include "TClonesArray.h"
-#include "StThreeVectorF.hh"
-#include "StLorentzVectorF.hh"
-#include "StPicoDstMaker/StPicoDst.h"
+#include "StPicoEvent/StPicoDst.h"
 #include "StPicoDstMaker/StPicoDstMaker.h"
 #include "StPicoEvent/StPicoEvent.h"
 #include "StPicoEvent/StPicoTrack.h"
@@ -20,7 +23,6 @@
 #include "StPicoHFMaker/StHFCuts.h"
 #include "StPicoHFMaker/StHFPair.h"
 //#include "StPicoHFMaker/StHFTriplet.h"
-#include "StBTofUtil/tofPathLength.hh"
 
 #include "phys_constants.h"
 
@@ -43,7 +45,7 @@ class TProfile;
 class StPicoD0AnaMaker : public StPicoHFMaker
 {
 public:
-    StPicoD0AnaMaker(char const*, StPicoDstMaker*, char const*, char const*);
+    StPicoD0AnaMaker(char const*, StPicoDstMaker*, char const*);
     virtual ~StPicoD0AnaMaker();
 
     virtual Int_t InitHF();
@@ -56,6 +58,8 @@ public:
     bool isGoodHadron(StPicoTrack const*) const;
 
 protected:
+    std::vector<unsigned short> mIdxPicoPions;
+    std::vector<unsigned short> mIdxPicoKaons;
 
 private:
     int createCandidates();
@@ -63,6 +67,7 @@ private:
 
     TNtuple *ntp_DMeson_Signal;
     TNtuple *ntp_DMeson_Background;
+<<<<<<< HEAD
 //    TNtuple *ntp_kaon;
 //    TNtuple *ntp_pion;
 
@@ -96,6 +101,8 @@ private:
     TProfile *corrD2[2];
     TProfile *dirFlow2; 
 
+=======
+>>>>>>> f6b502a69ce0930c336534a90b74d11c6b2ffcaf
 
     bool getHadronCorV2(int );
     bool getCorV2(StHFPair *, double);
