@@ -212,9 +212,9 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight) {
         float etaHadron = hadron->gMom().PseudoRapidity();
         float phiHadron = hadron->gMom().Phi();
         //if(!isEtaGap(kp->eta(),etaGap[k],etaHadron))  continue;
-        if(kp->eta() < -0.5*etaGap[k] && etaHadron < -0.5*etaGap) continue;
-        if(kp->eta() > 0.5*etaGap[k] && etaHadron > 0.5*etaGap) continue;
-        if(kp->eta() > -0.5*etaGap[k] && kp->eta() < 0.5*etaGap) continue;
+        if(kp->eta() < -0.5*etaGap[k] && etaHadron < -0.5*etaGap[k]) continue;
+        if(kp->eta() > 0.5*etaGap[k] && etaHadron > 0.5*etaGap[k]) continue;
+        if(kp->eta() > -0.5*etaGap[k] && kp->eta() < 0.5*etaGap[k]) continue;
         corFill[3]++;
         corFill[4] += sin(2*phiHadron)/sqrt(hadronv2);
         corFill[5] += cos(2*phiHadron)/sqrt(hadronv2);
