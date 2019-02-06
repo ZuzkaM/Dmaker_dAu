@@ -73,10 +73,10 @@ int StPicoD0V2AnaMaker::createCandidates() {
 // _________________________________________________________
 void StPicoD0V2AnaMaker::DeclareHistograms() {
     TString names[4] = {"cos_B", "cos_F", "sin_B", "sin_F"}; //backward and forward samples
-//    float multBin[6] = {0, 7, 12, 16, 22, 100};
+    float multBin[6] = {0, 7, 12, 16, 22, 100};
     int nMultBins = sizeof(multBin)/sizeof(multBin[0])-1;
 
-    float momBins[7] = {0,1,2,3,4,5,10};
+    float momBins[4] = {1,2,3,5};
     int nMomBins = sizeof(momBins)/sizeof(momBins[0])-1;
 
     for(int m = 0; m < 4; m++) {
