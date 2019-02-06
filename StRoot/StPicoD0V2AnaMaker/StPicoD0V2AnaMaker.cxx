@@ -42,7 +42,6 @@ int StPicoD0V2AnaMaker::FinishHF() {
 // _________________________________________________________
 int StPicoD0V2AnaMaker::MakeHF() {
     createCandidates();
-    getHadronCorV2(1);
     return kStOK;
 }
 
@@ -62,6 +61,8 @@ int StPicoD0V2AnaMaker::createCandidates() {
             if(pair->m() < 1.804 || pair->m() > 1.924 || pair->pt() < 1 || pair->pt() > 5) continue;
             
             if (mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) getCorV2(pair, 1);
+
+            if(!mHFCuts->isGoodSecondaryVertexPair(pair) || pair->m() < 1.804 || pair->m() > 1.924 || pair->pt() < 1 || pair->pt() > 5) getHadronCorV2(1);
 
 
         }  // for (unsigned short idxKaon = 0; idxKaon < mIdxPicoKaons.size(); ++idxKaon)
@@ -195,7 +196,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight) {
 //    float multBin[6] = {0,7,12,16,22,100};
     double etaGap[3] = {0,0.15,0.05};
 
-    int k=0;
+    int k=1;
     double corFill[7] = {0};
     corFill[0] = 1 ;
     corFill[1] = sin(2* kp->phi())/sqrt(hadronv2);
@@ -210,7 +211,10 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight) {
         if(i==kp->particle1Idx() || i==kp->particle2Idx()) continue;
         float etaHadron = hadron->gMom().PseudoRapidity();
         float phiHadron = hadron->gMom().Phi();
-        if(!isEtaGap(kp->eta(),etaGap[k],etaHadron))  continue;
+        //if(!isEtaGap(kp->eta(),etaGap[k],etaHadron))  continue;
+        if(kp->eta() < -0.5*etaGap[k] && etaHadron < -0.5*etaGap) continue;
+        if(kp->eta() > 0.5*etaGap[k] && etaHadron > 0.5*etaGap) continue;
+        if(kp->eta() > -0.5*etaGap[k] && kp->eta() < 0.5*etaGap) continue;
         corFill[3]++;
         corFill[4] += sin(2*phiHadron)/sqrt(hadronv2);
         corFill[5] += cos(2*phiHadron)/sqrt(hadronv2);
