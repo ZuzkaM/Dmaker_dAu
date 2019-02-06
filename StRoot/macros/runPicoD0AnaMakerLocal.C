@@ -99,8 +99,8 @@ void runPicoD0AnaMakerLocal(
 //  StPicoMixedEventMaker* picoMixedEventMaker = new StPicoMixedEventMaker("picoMixedEventMaker", picoDstMaker, hfCuts, outputFile);
 //  picoMixedEventMaker->setBufferSize(3);
 
-//  StPicoD0V2AnaMaker* PicoD0V2AnaMaker = new StPicoD0V2AnaMaker("picoD0V2AnaMaker", picoDstMaker, outputFile);
-//  PicoD0V2AnaMaker->setHFBaseCuts(hfCuts);
+  StPicoD0V2AnaMaker* PicoD0V2AnaMaker = new StPicoD0V2AnaMaker("picoD0V2AnaMaker", picoDstMaker, outputFile);
+  PicoD0V2AnaMaker->setHFBaseCuts(hfCuts);
 
 >>>>>>> f6b502a69ce0930c336534a90b74d11c6b2ffcaf
 
