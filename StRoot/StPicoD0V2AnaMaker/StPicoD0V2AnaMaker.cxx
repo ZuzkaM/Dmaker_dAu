@@ -42,6 +42,7 @@ int StPicoD0V2AnaMaker::FinishHF() {
 // _________________________________________________________
 int StPicoD0V2AnaMaker::MakeHF() {
     createCandidates();
+    getHadronCorV2(1);
     return kStOK;
 }
 
@@ -59,24 +60,50 @@ int StPicoD0V2AnaMaker::createCandidates() {
             StHFPair *pair = new StHFPair(pion1, kaon, mHFCuts->getHypotheticalMass(StPicoCutsBase::kPion),mHFCuts->getHypotheticalMass(StPicoCutsBase::kKaon), i, j, mPrimVtx, mBField, kTRUE); //the order (pion1, kaon) needs to stay same!
             if (!mHFCuts->isGoodSecondaryVertexPair(pair)) continue;
             if(pair->m() < 1.804 || pair->m() > 1.924 || pair->pt() < 1 || pair->pt() > 5) continue;
-            
-            if (mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) getCorV2(pair, 1);
 
-            if(!mHFCuts->isGoodSecondaryVertexPair(pair) || pair->m() < 1.804 || pair->m() > 1.924 || pair->pt() < 1 || pair->pt() > 5) getHadronCorV2(1);
-
-
+            makeV2(pair, 1);
         }  // for (unsigned short idxKaon = 0; idxKaon < mIdxPicoKaons.size(); ++idxKaon)
     } // for (unsigned short idxPion1 = 0; idxPion1 < mIdxPicoPions.size(); ++idxPion1)
 
     return kStOK;
 }
+
+// _________________________________________________________
+int StPicoD0V2AnaMaker::makeV2(StHFPair* pair, double reweight){
+    //mean 1.864, sigma 0.02
+//    if(pair->pt() > 1 && pair->pt() < 2) {
+//        if(pair->decayLength() > 0.012 && pair->dcaDaughters() < 0.007 && pair->DcaToPrimaryVertex() < 0.005 && cos(pair->pointingAngle()) > 0.5 && pair->particle2Dca() > 0.007 && pair->particle1Dca() > 0.009) {
+//            getCorV2(pair, reweight);
+//            cout<<"pt bin old ok 12"<<endl;
+//        }
+//    }
+//    if(pair->pt() > 2 && pair->pt() < 3)
+//    {
+//        if(pair->decayLength() > 0.003 && pair->dcaDaughters() < 0.016 && pair->DcaToPrimaryVertex() < 0.0065 && cos(pair->pointingAngle()) > 0.5 && pair->particle2Dca() > 0.01 && pair->particle1Dca() > 0.009) {
+//            getCorV2(pair, reweight);
+//            cout<<"pt bin old ok 23"<<endl;
+//        }
+//    }
+//    if(pair->pt() > 3 && pair->pt() < 5) {
+//        if (pair->decayLength() > 0.009 && pair->dcaDaughters() < 0.015 && pair->DcaToPrimaryVertex() < 0.0064 && cos(pair->pointingAngle()) > 0.6 && pair->particle2Dca() > 0.0076 && pair->particle1Dca() > 0.0064) {
+//            getCorV2(pair, reweight);
+//            cout << "pt bin old ok 35" << endl;
+//        }
+//    }
+//
+    if (mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) {
+        getCorV2(pair, reweight);
+    }
+    return kStOK;
+}
+
 // _________________________________________________________
 void StPicoD0V2AnaMaker::DeclareHistograms() {
     TString names[4] = {"cos_B", "cos_F", "sin_B", "sin_F"}; //backward and forward samples
-    float multBin[6] = {0, 7, 12, 16, 22, 100};
+//    float multBin[6] = {0, 7, 12, 16, 22, 100};
     int nMultBins = sizeof(multBin)/sizeof(multBin[0])-1;
 
-    float momBins[4] = {1,2,3,5};
+    float momBins[7] = {0,1,2,3,4,5,10};
     int nMomBins = sizeof(momBins)/sizeof(momBins[0])-1;
 
     for(int m = 0; m < 4; m++) {
@@ -196,7 +223,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight) {
 //    float multBin[6] = {0,7,12,16,22,100};
     double etaGap[3] = {0,0.15,0.05};
 
-    int k=1;
+    int k=0;
     double corFill[7] = {0};
     corFill[0] = 1 ;
     corFill[1] = sin(2* kp->phi())/sqrt(hadronv2);
@@ -211,10 +238,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight) {
         if(i==kp->particle1Idx() || i==kp->particle2Idx()) continue;
         float etaHadron = hadron->gMom().PseudoRapidity();
         float phiHadron = hadron->gMom().Phi();
-        //if(!isEtaGap(kp->eta(),etaGap[k],etaHadron))  continue;
-        if(kp->eta() < -0.5*etaGap[k] && etaHadron < -0.5*etaGap[k]) continue;
-        if(kp->eta() > 0.5*etaGap[k] && etaHadron > 0.5*etaGap[k]) continue;
-        if(kp->eta() > -0.5*etaGap[k] && kp->eta() < 0.5*etaGap[k]) continue;
+        if(!isEtaGap(kp->eta(),etaGap[k],etaHadron))  continue;
         corFill[3]++;
         corFill[4] += sin(2*phiHadron)/sqrt(hadronv2);
         corFill[5] += cos(2*phiHadron)/sqrt(hadronv2);
