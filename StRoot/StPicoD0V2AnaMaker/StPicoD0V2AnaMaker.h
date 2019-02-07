@@ -54,7 +54,7 @@ public:
 protected:
 
 private:
-    TVector3 createCandidates();
+    vector<int> createCandidates();
 
     TProfile *profV2[8][5][3];//i.S or B; j.flatten; k. differetn etaGap
     TH1D *hadronV2[5][3];
