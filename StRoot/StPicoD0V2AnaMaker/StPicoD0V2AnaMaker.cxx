@@ -46,9 +46,9 @@ int StPicoD0V2AnaMaker::MakeHF() {
 }
 
 // _________________________________________________________
-TVector3 StPicoD0V2AnaMaker::createCandidates() {
+std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
-	TVector3 tracksofCand;
+	std::vector<int> tracksofCand;
 
     for(unsigned int i=0;i<mPicoDst->numberOfTracks();i++)  {
         StPicoTrack const* pion1 = mPicoDst->track(i);
@@ -137,7 +137,7 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 
 // _________________________________________________________
 bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
-	TVector3 tracksToRemove = createCandidates();
+	std::vector<int> tracksToRemove = createCandidates();
 	
 	double etaGap[3] = {0,0.15,0.05};
     double mEtaGap = etaGap[idxGap];
@@ -259,7 +259,7 @@ bool StPicoD0V2AnaMaker::isEtaGap(double dEta,double mGap,double hEta) {
 
 bool StPicoD0V2AnaMaker::containsId(int id, std::vector<int>& tracksToRemove)
 {
-	for(int i = 0; i < tracksToRemove.size(); i++)
+	for(unsigned int i = 0; i < tracksToRemove.size(); i++)
 	{
 		if(id == tracksToRemove[i])
 			return true;
