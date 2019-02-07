@@ -41,13 +41,14 @@ int StPicoD0V2AnaMaker::FinishHF() {
 }
 // _________________________________________________________
 int StPicoD0V2AnaMaker::MakeHF() {
-    createCandidates();
     getHadronCorV2(1);
     return kStOK;
 }
 
 // _________________________________________________________
-int StPicoD0V2AnaMaker::createCandidates() {
+TVector3 StPicoD0V2AnaMaker::createCandidates() {
+
+	vector<int> tracksofCand;
 
     for(unsigned int i=0;i<mPicoDst->numberOfTracks();i++)  {
         StPicoTrack const* pion1 = mPicoDst->track(i);
@@ -60,41 +61,18 @@ int StPicoD0V2AnaMaker::createCandidates() {
             StHFPair *pair = new StHFPair(pion1, kaon, mHFCuts->getHypotheticalMass(StPicoCutsBase::kPion),mHFCuts->getHypotheticalMass(StPicoCutsBase::kKaon), i, j, mPrimVtx, mBField, kTRUE); //the order (pion1, kaon) needs to stay same!
             if (!mHFCuts->isGoodSecondaryVertexPair(pair)) continue;
             if(pair->m() < 1.804 || pair->m() > 1.924 || pair->pt() < 1 || pair->pt() > 5) continue;
+			if (!mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) continue;
 
-            makeV2(pair, 1);
+			getCorV2(pair, reweight);
+
+			tracksofCand.push_back(pion1->id());
+			tracksofCand.push_back(kaon->id());
+
+
         }  // for (unsigned short idxKaon = 0; idxKaon < mIdxPicoKaons.size(); ++idxKaon)
     } // for (unsigned short idxPion1 = 0; idxPion1 < mIdxPicoPions.size(); ++idxPion1)
 
-    return kStOK;
-}
-
-// _________________________________________________________
-int StPicoD0V2AnaMaker::makeV2(StHFPair* pair, double reweight){
-    //mean 1.864, sigma 0.02
-//    if(pair->pt() > 1 && pair->pt() < 2) {
-//        if(pair->decayLength() > 0.012 && pair->dcaDaughters() < 0.007 && pair->DcaToPrimaryVertex() < 0.005 && cos(pair->pointingAngle()) > 0.5 && pair->particle2Dca() > 0.007 && pair->particle1Dca() > 0.009) {
-//            getCorV2(pair, reweight);
-//            cout<<"pt bin old ok 12"<<endl;
-//        }
-//    }
-//    if(pair->pt() > 2 && pair->pt() < 3)
-//    {
-//        if(pair->decayLength() > 0.003 && pair->dcaDaughters() < 0.016 && pair->DcaToPrimaryVertex() < 0.0065 && cos(pair->pointingAngle()) > 0.5 && pair->particle2Dca() > 0.01 && pair->particle1Dca() > 0.009) {
-//            getCorV2(pair, reweight);
-//            cout<<"pt bin old ok 23"<<endl;
-//        }
-//    }
-//    if(pair->pt() > 3 && pair->pt() < 5) {
-//        if (pair->decayLength() > 0.009 && pair->dcaDaughters() < 0.015 && pair->DcaToPrimaryVertex() < 0.0064 && cos(pair->pointingAngle()) > 0.6 && pair->particle2Dca() > 0.0076 && pair->particle1Dca() > 0.0064) {
-//            getCorV2(pair, reweight);
-//            cout << "pt bin old ok 35" << endl;
-//        }
-//    }
-//
-    if (mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) {
-        getCorV2(pair, reweight);
-    }
-    return kStOK;
+    return tracksofCand;
 }
 
 // _________________________________________________________
@@ -159,7 +137,9 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 
 // _________________________________________________________
 bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
-    double etaGap[3] = {0,0.15,0.05};
+	TVector3 tracksToRemove = createCandidates();
+	
+	double etaGap[3] = {0,0.15,0.05};
     double mEtaGap = etaGap[idxGap];
     float hadronFill[7] = {0};
     const double reweight = 1;//mGRefMultCorrUtil->getWeight();
@@ -168,6 +148,8 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 
     for(unsigned int i=0;i<mPicoDst->numberOfTracks();++i) {
         StPicoTrack const* hadron = mPicoDst->track(i);
+        if(containsId(hadron->id(), tracksToRemove)) continue;
+
         if(!mHFCuts->isGoodTrack(hadron)) continue;
         if(!mHFCuts->isGoodProton(hadron) && !mHFCuts->isGoodKaon(hadron) && !mHFCuts->isGoodPion(hadron)) continue;
         float etaHadron = hadron->gMom().PseudoRapidity();
@@ -273,4 +255,13 @@ bool StPicoD0V2AnaMaker::isEtaGap(double dEta,double mGap,double hEta) {
         return hEta<-mGap;
     else
         return hEta>mGap;
+}
+
+bool StPicoD0V2AnaMaker::containsId(int id, std::vector<int>& tracksToRemove)
+{
+	for(int i = 0; i < tracksToRemove.size(); i++)
+	{
+		if(id == tracksToRemove[i])
+			return true;
+	}
 }

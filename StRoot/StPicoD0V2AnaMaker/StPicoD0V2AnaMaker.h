@@ -54,7 +54,7 @@ public:
 protected:
 
 private:
-    int createCandidates();
+    TVector3 createCandidates();
 
     TProfile *profV2[8][5][3];//i.S or B; j.flatten; k. differetn etaGap
     TH1D *hadronV2[5][3];
@@ -86,10 +86,10 @@ private:
     TProfile *corrD2[2];
     TProfile *dirFlow2;
 
-    int makeV2(StHFPair*, double);
     bool getHadronCorV2(int );
     bool getCorV2(StHFPair *, double);
     bool isEtaGap(double, double ,double);
+    bool containsId(int id, std::vector<int>& tracksToRemove);
 
 
     TString mOutFileBaseName;
