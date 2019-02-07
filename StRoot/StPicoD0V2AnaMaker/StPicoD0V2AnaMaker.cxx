@@ -48,7 +48,7 @@ int StPicoD0V2AnaMaker::MakeHF() {
 // _________________________________________________________
 TVector3 StPicoD0V2AnaMaker::createCandidates() {
 
-	vector<int> tracksofCand;
+	TVector3 tracksofCand;
 
     for(unsigned int i=0;i<mPicoDst->numberOfTracks();i++)  {
         StPicoTrack const* pion1 = mPicoDst->track(i);
@@ -63,7 +63,7 @@ TVector3 StPicoD0V2AnaMaker::createCandidates() {
             if(pair->m() < 1.804 || pair->m() > 1.924 || pair->pt() < 1 || pair->pt() > 5) continue;
 			if (!mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) continue;
 
-			getCorV2(pair, reweight);
+			getCorV2(pair, 1);
 
 			tracksofCand.push_back(pion1->id());
 			tracksofCand.push_back(kaon->id());
