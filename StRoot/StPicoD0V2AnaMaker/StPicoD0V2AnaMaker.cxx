@@ -62,6 +62,7 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
             if (!mHFCuts->isGoodSecondaryVertexPair(pair)) continue;
             if(pair->m() < 1.804 || pair->m() > 1.924 || pair->pt() < 1 || pair->pt() > 5) continue;
 			if (!mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) continue;
+			if (pair->eta() < 0.075 && pair->eta() > -0.075) continue; //eta gap
 
 			getCorV2(pair, 1);
 
@@ -268,9 +269,9 @@ bool StPicoD0V2AnaMaker::isEtaGap(double dEta,double mGap,double hEta) {
     // else
     //   return (hEta>(dEta+mGap) || hEta<(dEta-mGap));
     if(dEta>0)
-        return hEta<-mGap;
+        return hEta<-*0.5*mGap;
     else
-        return hEta>mGap;
+        return hEta>0.5*mGap;
 }
 
 bool StPicoD0V2AnaMaker::containsId(int id, std::vector<int>& tracksToRemove)
