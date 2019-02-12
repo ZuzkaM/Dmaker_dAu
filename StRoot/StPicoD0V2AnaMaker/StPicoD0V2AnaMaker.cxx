@@ -269,7 +269,7 @@ bool StPicoD0V2AnaMaker::isEtaGap(double dEta,double mGap,double hEta) {
     // else
     //   return (hEta>(dEta+mGap) || hEta<(dEta-mGap));
     if(dEta>0)
-        return hEta<-*0.5*mGap;
+        return hEta<-0.5*mGap;
     else
         return hEta>0.5*mGap;
 }
