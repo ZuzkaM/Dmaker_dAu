@@ -61,6 +61,10 @@ private:
     TH1D *hadronV2_sum[5][3];
     TH1D *hadron_phi;
     TH1D *D_phi;
+    TH1D *hadron_phi_etaP;
+    TH1D *D_phi_etaP;
+    TH1D *hadron_phi_etaN;
+    TH1D *D_phi_etaN;
     TH2D *fitPhi[6];
     TH2D *massPt;
     TH2D *massPtLike;

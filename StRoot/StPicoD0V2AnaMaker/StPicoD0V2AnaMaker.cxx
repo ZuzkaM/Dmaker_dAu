@@ -81,7 +81,7 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
 //    float multBin[6] = {0, 7, 12, 16, 22, 100};
     int nMultBins = sizeof(multBin)/sizeof(multBin[0])-1;
 
-    float momBins[7] = {0,1,2,3,4,5,10};
+    float momBins[4] = {1,2,3,5};
     int nMomBins = sizeof(momBins)/sizeof(momBins[0])-1;
 
     for(int m = 0; m < 4; m++) {
@@ -109,6 +109,12 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
 
     hadron_phi = new TH1D("hadron_phi", "Hadron phi", 2000, -5, 5);
     D_phi = new TH1D("D_phi", "D phi", 2000, -5, 5);
+
+    hadron_phi_etaP = new TH1D("hadron_phi_etaP", "Hadron phi, eta > 0", 2000, -5, 5);
+    D_phi_etaP = new TH1D("D_phi_etaP", "D phi, eta > 0", 2000, -5, 5);
+
+    hadron_phi_etaN = new TH1D("hadron_phi_etaN", "Hadron phi, eta < 0", 2000, -5, 5);
+    D_phi_etaN = new TH1D("D_phi_etaN", "D phi, eta < 0", 2000, -5, 5);
 }
 
 // _________________________________________________________
@@ -133,6 +139,12 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 
     hadron_phi->Write();
     D_phi->Write();
+
+    hadron_phi_etaP->Write();
+    D_phi_etaP->Write();
+
+    hadron_phi_etaN->Write();
+    D_phi_etaN->Write();
 }
 
 // _________________________________________________________
@@ -167,6 +179,8 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
             hadronFill[5] += cos(2 * phiHadron);
         }
         hadron_phi->Fill(phiHadron);
+        if(etaHadron>0) hadron_phi_etaP->Fill(phiHadron);
+        if(etaHadron<0) hadron_phi_etaN->Fill(phiHadron);
     }
 
     hadronFill[6] = mult;
@@ -212,6 +226,8 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight) {
     corFill[2] = cos(2* kp->phi())/sqrt(hadronv2);
 
     D_phi->Fill(kp->phi());
+    if(kp->eta()>0) D_phi_etaP->Fill(kp->phi());
+    if(kp->eta()<0) D_phi_etaN->Fill(kp->phi());
 
     for(unsigned int i=0; i<mPicoDst->numberOfTracks();i++) {
         StPicoTrack const* hadron = mPicoDst->track(i);
