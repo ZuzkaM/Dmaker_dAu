@@ -108,6 +108,9 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     refFlow = new TProfile("refFlow", "", nMultBins, multBin);
     refFlow2 = new TProfile("refFlow_no_mult", "", 1, 0, 100);
 
+    cosH = new TProfile("ReQ", "Re Q", 1, 0, 100);
+    sinH = new TProfile("ImQ", "Im Q", 1, 0, 100);
+
     hadron_phi = new TH1D("hadron_phi", "Hadron phi", 2000, -5, 5);
     D_phi = new TH1D("D_phi", "D phi", 2000, -5, 5);
 
@@ -146,6 +149,9 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 
     hadron_phi_etaN->Write();
     D_phi_etaN->Write();
+
+    cosH->Write();
+    sinH->Write();
 }
 
 // _________________________________________________________
@@ -155,6 +161,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 	double etaGap[3] = {0,0.15,0.05};
     double mEtaGap = etaGap[idxGap];
     float hadronFill[7] = {0};
+    float Qvec[3] = 0;
     const double reweight = 1;//mGRefMultCorrUtil->getWeight();
     // int centrality  = mGRefMultCorrUtil->getCentralityBin9();
     int mult = mPicoEvent->grefMult();
@@ -167,6 +174,10 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         if(!mHFCuts->isGoodProton(hadron) && !mHFCuts->isGoodKaon(hadron) && !mHFCuts->isGoodPion(hadron)) continue;
         float etaHadron = hadron->gMom().PseudoRapidity();
         float phiHadron = hadron->gMom().Phi();
+
+        Qvec[0]++;
+        Qvec[1] += cos(2 * phiHadron);
+        Qvec[2] += sin(2 * phiHadron);
 
         if(etaHadron<-0.5*mEtaGap) {//backward sample
             hadronFill[0]++;
@@ -208,6 +219,10 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         qVec2[2]->Fill(mult, hadronFill[1]/hadronFill[0], reweight);
         qVec2[3]->Fill(mult, hadronFill[4]/hadronFill[3], reweight);
         refFlow2->Fill(mult, ((hadronFill[2]*hadronFill[5])/(hadronFill[0]*hadronFill[3])), reweight);
+
+        //for non-uniform acceptance
+        cosH->Fill(mult, Qvec[1]/Qvec[0]);
+        sinH->Fill(mult, Qvec[2]/Qvec[0]);
     }
     return true;
 }

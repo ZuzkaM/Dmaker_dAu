@@ -89,6 +89,9 @@ private:
     TProfile *refFlow2;
     TProfile *corrD2[2];
     TProfile *dirFlow2;
+    TProfile *cosH;
+    TProfile *sinH;
+ 
 
     bool getHadronCorV2(int );
     bool getCorV2(StHFPair *, double);
