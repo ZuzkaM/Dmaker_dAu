@@ -161,7 +161,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 	double etaGap[3] = {0,0.15,0.05};
     double mEtaGap = etaGap[idxGap];
     float hadronFill[7] = {0};
-    float Qvec[3] = 0;
+    float Qvec[3] = {0};
     const double reweight = 1;//mGRefMultCorrUtil->getWeight();
     // int centrality  = mGRefMultCorrUtil->getCentralityBin9();
     int mult = mPicoEvent->grefMult();
@@ -237,7 +237,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight) {
 
     int k=0;
     double corFill[7] = {0};
-    corFill[0] = {1};
+    corFill[0] = 1 ;
     corFill[1] = sin(2* kp->phi())/sqrt(hadronv2);
     corFill[2] = cos(2* kp->phi())/sqrt(hadronv2);
 
