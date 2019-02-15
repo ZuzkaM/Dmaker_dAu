@@ -168,12 +168,13 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 
     for(unsigned int i=0;i<mPicoDst->numberOfTracks();++i) {
         StPicoTrack const* hadron = mPicoDst->track(i);
-        if(containsId(hadron->id(), tracksToRemove)) continue;
-
+    
         if(!mHFCuts->isGoodTrack(hadron)) continue;
         if(!mHFCuts->isGoodProton(hadron) && !mHFCuts->isGoodKaon(hadron) && !mHFCuts->isGoodPion(hadron)) continue;
         float etaHadron = hadron->gMom().PseudoRapidity();
         float phiHadron = hadron->gMom().Phi();
+
+        if(containsId(hadron->id(), tracksToRemove)) continue;
 
         Qvec[0]++;
         Qvec[1] += cos(2 * phiHadron);
