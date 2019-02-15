@@ -79,6 +79,12 @@ void flow()
 	for(int i = 1; i < 6; i++)
 		{
 			//computing c_2{2} via reference flow
+			/*********
+			 * nacitam reference flow, tvoreny zo vsetkych hadronov (okrem K pi z kandidata)
+			 * pocitany v StPicoD0V2AnaMaker
+			 * ako sum cos(2Phi) vsetkych vo forward * sum cos(2Phi) vsetkych v backward casti
+			 * vydelene sum f * b
+			 *********/
 			r = refFlow->GetBinContent(i);
 			//cout << "multiplicity from " << multBinNames[i-1] << " to " << multBinNames[i] << "  value of c_2{2} " << r << endl;
 			/************
@@ -134,6 +140,17 @@ void flow()
 	for (int i = 0; i < 5; i++)
 		{
 			//computing v2 via directed flow
+			/******
+			 * nacitam directed flow
+			 * pocitany v StPicoD0V2AnaMaker
+			 * pocitany cand by cand, nie event by event
+			 * je to fcia pT
+			 *
+			 *
+			 * v2 vysledne je pocitane ako dir. flow / ref. flow
+			 * kde ref. flow je odmocnina cumulantu
+			 *****/
+
 			d2[i] = new TH1D(TString::Format("d2_%d", i), "d_2{2}", 3, momBins);
 			v2[i] = new TH1D(TString::Format("v2_%d", i), "v_{2};p_{T};v_{2}", 3, momBins);
 			d2[i]->SetEntries(dirFlow[i]->GetEntries());
@@ -210,6 +227,8 @@ void flow()
 	//d2_all_mult->Write();
 	v2_all_mult_noC->Write();
 	d2_all_mult_noC->Write();
+
+	v2_all_mult_noC->Draw();
 
 	//v2_all_mult->Draw();
 	//v2_all_mult_noC->SetLineColor(kRed);
