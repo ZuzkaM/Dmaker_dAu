@@ -22,7 +22,9 @@ void flow()
     TProfile *qVec2[4]; //Q vektory
     TProfile *refFlow2; //referencny tok 
     TProfile *dirFlow2; //diferencialny tok (fcia PT)
-    TProfile *corrD2[2]; //cos/sin D pre rozne pT 
+    TProfile *corrD2[2]; //cos/sin D pre rozne pT
+    TProfile *ReQ;
+    TProfile *ImQ;
     
     //TProfile *c2;
     TH1D *c2; 
@@ -68,7 +70,11 @@ void flow()
   	refFlow2 = (TProfile *)file->Get("refFlow_no_mult");
 
 
-  	//zacina samotny vypocet.... vzorceky z vlanku arxiv:1010.0233, resp. proceedings wejcf, v kombinacii s Katkou (niektore veci ako eta gap) a s ana note v2 D0 v Au+Au
+    ReQ = (TProfile *)file->Get("ReQ");
+    ImQ = (TProfile *)file->Get("ImQ");
+
+
+  	//zacina samotny vypocet.... vzorceky z clanku arxiv:1010.0233, resp. proceedings wejcf, v kombinacii s Katkou (niektore veci ako eta gap) a s ana note v2 D0 v Au+Au
 
   	
 	float d,r,c,s,cA,cB,sA,sB,rEr,cEr,sEr,final,errorC,error,cumulant,cumEr; //len pomocne premenne
@@ -79,12 +85,6 @@ void flow()
 	for(int i = 1; i < 6; i++)
 		{
 			//computing c_2{2} via reference flow
-			/*********
-			 * nacitam reference flow, tvoreny zo vsetkych hadronov (okrem K pi z kandidata)
-			 * pocitany v StPicoD0V2AnaMaker
-			 * ako sum cos(2Phi) vsetkych vo forward * sum cos(2Phi) vsetkych v backward casti
-			 * vydelene sum f * b
-			 *********/
 			r = refFlow->GetBinContent(i);
 			//cout << "multiplicity from " << multBinNames[i-1] << " to " << multBinNames[i] << "  value of c_2{2} " << r << endl;
 			/************
@@ -110,7 +110,9 @@ void flow()
 		}
 
 	r = refFlow2->GetBinContent(1);
-	/*
+    //c = ReQ->GetBinContent(1);
+    //s = ImQ->GetBinContent(1);
+    /*
 	c = qVec2[0]->GetBinContent(1);
 	s = qVec2[2]->GetBinContent(1);
 	final = r - c*c - s*s;
@@ -130,27 +132,21 @@ void flow()
 	cum->SetBinError(1, error);
 	cum->Print("all");
 	*/
+    error = (0.5*refFlow2->GetBinContent(1))/TMath::Sqrt(r);
 	cum_noC->SetEntries(refFlow2->GetEntries());
 	cum_noC->SetBinContent(1, (TMath::Sqrt(r)));
-	cum_noC->SetBinError(1, refFlow2->GetBinError(1));
+	cum_noC->SetBinError(1, error);
+	cout << "fancy error " <<  error << endl;
+	cout << "error just from RF" << refFlow2->GetBinContent(1);
 
 	printf("error just from ref flow %f \n", refFlow2->GetBinError(1));
 	printf(" fancy error %f \n", error);
 
+	cum_noC->Draw();
+
 	for (int i = 0; i < 5; i++)
 		{
 			//computing v2 via directed flow
-			/******
-			 * nacitam directed flow
-			 * pocitany v StPicoD0V2AnaMaker
-			 * pocitany cand by cand, nie event by event
-			 * je to fcia pT
-			 *
-			 *
-			 * v2 vysledne je pocitane ako dir. flow / ref. flow
-			 * kde ref. flow je odmocnina cumulantu
-			 *****/
-
 			d2[i] = new TH1D(TString::Format("d2_%d", i), "d_2{2}", 3, momBins);
 			v2[i] = new TH1D(TString::Format("v2_%d", i), "v_{2};p_{T};v_{2}", 3, momBins);
 			d2[i]->SetEntries(dirFlow[i]->GetEntries());
@@ -160,7 +156,7 @@ void flow()
 				d = dirFlow[i]->GetBinContent(j);
 				c = (corrD[0][i]->GetBinContent(j))*(qVec[0]->GetBinContent(i+1));
 				s = (corrD[1][i]->GetBinContent(j))*(qVec[2]->GetBinContent(i+1));
-				//final = d - c - s;
+		    	//final = d - c - s;
 				final = d;
 				d2[i]->SetBinContent(j, final);
 				d2[i]->SetBinError(j, dirFlow[i]->GetBinError(j));
@@ -176,8 +172,8 @@ void flow()
 	d2_all_mult_noC = new TH1D("d2_all_mult_noC", "d_2{2}", 3, momBins);
 	v2_all_mult_noC = new TH1D("v2_all_mult_noC", "v_{2};p_{T};v_{2}", 3, momBins);
 
-	cumulant = cum->GetBinContent(1);
-	cumEr = cum->GetBinError(1);
+	cumulant = cum_noC->GetBinContent(1);
+	cumEr = cum_noC->GetBinError(1);
 
 	double dirEr,dirF;
 	
@@ -209,10 +205,15 @@ void flow()
 				*/
 				v2_all_mult_noC->SetEntries(dirFlow2->GetEntries());
 				v2_all_mult_noC->SetBinContent(j,(d2_all_mult_noC->GetBinContent(j))/(cum_noC->GetBinContent(1)));
-				v2_all_mult_noC->SetBinError(j,(d2_all_mult_noC->GetBinError(j))/(cum_noC->GetBinContent(1)));
+
+                dirEr = d2_all_mult->GetBinError(j);
+                dirF = d2_all_mult->GetBinContent(j);
+
+				error = TMath::Sqrt( (dirEr*dirEr)/(cumulant*cumulant) + (dirF*dirF*cumEr*cumEr)/(cumulant*cumulant*cumulant*cumulant) );
+				v2_all_mult_noC->SetBinError(j,error);
 			}
 
-	
+	v2_all_mult_noC->Draw();
 
 	TFile *output = new TFile("v2_output.root", "recreate");
 	c2->Write();
@@ -227,8 +228,6 @@ void flow()
 	//d2_all_mult->Write();
 	v2_all_mult_noC->Write();
 	d2_all_mult_noC->Write();
-
-	v2_all_mult_noC->Draw();
 
 	//v2_all_mult->Draw();
 	//v2_all_mult_noC->SetLineColor(kRed);
