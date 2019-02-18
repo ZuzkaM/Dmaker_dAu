@@ -64,7 +64,11 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 			if (!mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) continue;
 			if (pair->eta() < 0.075 && pair->eta() > -0.075) continue; //eta gap
 
-			getCorV2(pair, 1);
+			int charge = 0;
+            if((kaon->charge() + pion1->charge() != 0) ) charge = 1;
+
+			getCorV2(pair, 1, charge);
+
 
 			tracksofCand.push_back(pion1->id());
 			tracksofCand.push_back(kaon->id());
@@ -100,11 +104,20 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
         corrD[0][m] = new TProfile(Form("cosD_%.0f_%.0f", multBin[m], multBin[m+1]), "", nMomBins, momBins);
         corrD[1][m] = new TProfile(Form("sinD_%.0f_%.0f", multBin[m], multBin[m+1]), "", nMomBins, momBins);
         dirFlow[m] = new TProfile(Form("dirFlow_%.0f_%.0f", multBin[m], multBin[m+1]), "", nMomBins, momBins);
+
+        corrDBKG[0][m] = new TProfile(Form("cosD_%.0f_%.0f_BKG", multBin[m], multBin[m+1]), "", nMomBins, momBins);
+        corrDBKG[1][m] = new TProfile(Form("sinD_%.0f_%.0f_BKG", multBin[m], multBin[m+1]), "", nMomBins, momBins);
+        dirFlowBKG[m] = new TProfile(Form("dirFlow_%.0f_%.0f_BKG", multBin[m], multBin[m+1]), "", nMomBins, momBins);
     }
 
     corrD2[0] = new TProfile("cosD_no_mult","cos D", nMomBins, momBins);
     corrD2[1] = new TProfile("sinD_no_mult","sin D", nMomBins, momBins);
     dirFlow2 = new TProfile("dirFlow_no_mult","dir flow", nMomBins, momBins);
+
+    corrD2BKG[0] = new TProfile("cosD_no_mult_BKG","cos D _BKG", nMomBins, momBins);
+    corrD2BKG[1] = new TProfile("sinD_no_mult_BKG","sin D _BKG", nMomBins, momBins);
+    dirFlow2BKG= new TProfile("dirFlow_no_mult_BKG","dir flow _BKG", nMomBins, momBins);
+
     refFlow = new TProfile("refFlow", "", nMultBins, multBin);
     refFlow2 = new TProfile("refFlow_no_mult", "", 1, 0, 100);
 
@@ -134,12 +147,20 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
         corrD[0][m]->Write();
         corrD[1][m]->Write();
         dirFlow[m]->Write();
+
+        corrDBKG[0][m]->Write();
+        corrDBKG[1][m]->Write();
+        dirFlowBKG[m]->Write();
     }
 
     corrD2[0]->Write();
     corrD2[1]->Write();
     dirFlow2->Write();
     refFlow2->Write();
+
+    corrD2BKG[0]->Write();
+    corrD2BKG[1]->Write();
+    dirFlow2BKG->Write();
 
     hadron_phi->Write();
     D_phi->Write();
@@ -229,7 +250,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 }
 
 // _________________________________________________________
-bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight) {
+bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
     int mult = mPicoEvent->grefMult();
 
     double hadronv2=1;
@@ -239,36 +260,67 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight) {
     int k=0;
     double corFill[7] = {0};
     corFill[0] = 1 ;
-    corFill[1] = sin(2* kp->phi())/sqrt(hadronv2);
-    corFill[2] = cos(2* kp->phi())/sqrt(hadronv2);
+    if(charge == 0) {
+        corFill[1] = sin(2 * kp->phi()) / sqrt(hadronv2);
+        corFill[2] = cos(2 * kp->phi()) / sqrt(hadronv2);
 
-    D_phi->Fill(kp->phi());
-    if(kp->eta()>0) D_phi_etaP->Fill(kp->phi());
-    if(kp->eta()<0) D_phi_etaN->Fill(kp->phi());
+        D_phi->Fill(kp->phi());
+        if (kp->eta() > 0) D_phi_etaP->Fill(kp->phi());
+        if (kp->eta() < 0) D_phi_etaN->Fill(kp->phi());
 
-    for(unsigned int i=0; i<mPicoDst->numberOfTracks();i++) {
-        StPicoTrack const* hadron = mPicoDst->track(i);
-        if(!mHFCuts->isGoodTrack(hadron)) continue;
-        if(!mHFCuts->isGoodProton(hadron) && !mHFCuts->isGoodKaon(hadron) && !mHFCuts->isGoodPion(hadron)) continue;
-        if(i==kp->particle1Idx() || i==kp->particle2Idx()) continue;
-        float etaHadron = hadron->gMom().PseudoRapidity();
-        float phiHadron = hadron->gMom().Phi();
-        if(!isEtaGap(kp->eta(),etaGap[k],etaHadron))  continue;
-        corFill[3]++;
-        corFill[4] += sin(2*phiHadron)/sqrt(hadronv2);
-        corFill[5] += cos(2*phiHadron)/sqrt(hadronv2);
+        for (unsigned int i = 0; i < mPicoDst->numberOfTracks(); i++) {
+            StPicoTrack const *hadron = mPicoDst->track(i);
+            if (!mHFCuts->isGoodTrack(hadron)) continue;
+            if (!mHFCuts->isGoodProton(hadron) && !mHFCuts->isGoodKaon(hadron) && !mHFCuts->isGoodPion(hadron)) continue;
+            if (i == kp->particle1Idx() || i == kp->particle2Idx()) continue;
+            float etaHadron = hadron->gMom().PseudoRapidity();
+            float phiHadron = hadron->gMom().Phi();
+            if (!isEtaGap(kp->eta(), etaGap[k], etaHadron)) continue;
+            corFill[3]++;
+            corFill[4] += sin(2 * phiHadron) / sqrt(hadronv2);
+            corFill[5] += cos(2 * phiHadron) / sqrt(hadronv2);
 
-        for(int m = 0; m < 5; m++) {
-            if(mult >= multBin[m] && mult < multBin[m+1]) {
-                corrD[0][m]->Fill(kp->pt(), corFill[2], weight);
-                corrD[1][m]->Fill(kp->pt(), corFill[1], weight);
-                dirFlow[m]->Fill(kp->pt(), corFill[2]*corFill[5]/corFill[3], weight);
+            for (int m = 0; m < 5; m++) {
+                if (mult >= multBin[m] && mult < multBin[m + 1]) {
+                    corrD[0][m]->Fill(kp->pt(), corFill[2], weight);
+                    corrD[1][m]->Fill(kp->pt(), corFill[1], weight);
+                    dirFlow[m]->Fill(kp->pt(), corFill[2] * corFill[5] / corFill[3], weight);
+                }
             }
+
+            corrD2[0]->Fill(kp->pt(), corFill[2], weight);
+            corrD2[1]->Fill(kp->pt(), corFill[1], weight);
+            dirFlow2->Fill(kp->pt(), corFill[2] * corFill[5] / corFill[3], weight);
+        }
+    }
+    else{
+        corFill[1] = sin(2 * kp->phi()) / sqrt(hadronv2);
+        corFill[2] = cos(2 * kp->phi()) / sqrt(hadronv2);
+        for (unsigned int i = 0; i < mPicoDst->numberOfTracks(); i++) {
+            StPicoTrack const *hadron = mPicoDst->track(i);
+            if (!mHFCuts->isGoodTrack(hadron)) continue;
+            if (!mHFCuts->isGoodProton(hadron) && !mHFCuts->isGoodKaon(hadron) && !mHFCuts->isGoodPion(hadron)) continue;
+            if (i == kp->particle1Idx() || i == kp->particle2Idx()) continue;
+            float etaHadron = hadron->gMom().PseudoRapidity();
+            float phiHadron = hadron->gMom().Phi();
+            if (!isEtaGap(kp->eta(), etaGap[k], etaHadron)) continue;
+            corFill[3]++;
+            corFill[4] += sin(2 * phiHadron) / sqrt(hadronv2);
+            corFill[5] += cos(2 * phiHadron) / sqrt(hadronv2);
+
+            for (int m = 0; m < 5; m++) {
+                if (mult >= multBin[m] && mult < multBin[m + 1]) {
+                    corrDBKG[0][m]->Fill(kp->pt(), corFill[2], weight);
+                    corrDBKG[1][m]->Fill(kp->pt(), corFill[1], weight);
+                    dirFlowBKG[m]->Fill(kp->pt(), corFill[2] * corFill[5] / corFill[3], weight);
+                }
+            }
+
+            corrD2BKG[0]->Fill(kp->pt(), corFill[2], weight);
+            corrD2BKG[1]->Fill(kp->pt(), corFill[1], weight);
+            dirFlow2BKG->Fill(kp->pt(), corFill[2] * corFill[5] / corFill[3], weight);
         }
 
-        corrD2[0]->Fill(kp->pt(), corFill[2], weight);
-        corrD2[1]->Fill(kp->pt(), corFill[1], weight);
-        dirFlow2->Fill(kp->pt(), corFill[2]*corFill[5]/corFill[3], weight);
     }
 
     return true;

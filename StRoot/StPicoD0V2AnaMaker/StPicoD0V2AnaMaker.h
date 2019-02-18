@@ -85,16 +85,20 @@ private:
     TProfile *refFlow;
     TProfile *dirFlow[5];
     TProfile *corrD[2][5];
+    TProfile *dirFlowBKG[5];
+    TProfile *corrDBKG[2][5];
     TProfile *qVec2[4];
     TProfile *refFlow2;
     TProfile *corrD2[2];
     TProfile *dirFlow2;
+    TProfile *corrD2BKG[2];
+    TProfile *dirFlow2BKG;
     TProfile *cosH;
     TProfile *sinH;
  
 
     bool getHadronCorV2(int );
-    bool getCorV2(StHFPair *, double);
+    bool getCorV2(StHFPair *, double, int);
     bool isEtaGap(double, double ,double);
     bool containsId(int id, std::vector<int>& tracksToRemove);
 
