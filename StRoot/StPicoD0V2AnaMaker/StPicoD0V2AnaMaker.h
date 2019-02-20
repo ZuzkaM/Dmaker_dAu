@@ -95,6 +95,8 @@ private:
     TProfile *dirFlow2BKG;
     TProfile *cosH;
     TProfile *sinH;
+    TProfile *diFlowMass;
+    TProfile *diFlowMassBKG;
  
 
     bool getHadronCorV2(int );
