@@ -193,7 +193,7 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
     diFlowMass->Write();
     diFlowMassBKG->Write();
 
-    for(int pT = 0; pT < nMomBins; pT++){
+    for(int pT = 0; pT < 3; pT++){
         for(int mult = 0; mult < 5; mult++){
             mass[pT][mult]->Write();
         }
