@@ -204,7 +204,7 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 	std::vector<int> tracksToRemove = createCandidates();
 
-    TFile *fileW=new TFile("weight.root");
+    TFile *fileW=new TFile("/star/u/zuzana/zuzana/D0v2/Dmaker_dAu/StRoot/StPicoD0V2AnaMaker/weight.root");
     if((!fileW) || (!fileW->IsOpen())) printf("file does not exist");
     weights = (TH1D *)fileW->Get("hadron_phi");
 
