@@ -127,7 +127,7 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     hadron_phi = new TH1D("hadron_phi", "Hadron phi", 2000, -5, 5);
     hadron_phi->Sumw2();
 
-    hadron_check = hadron_phi = new TH1D("hadron_check", "Hadron phi", 2000, -5, 5);
+    hadron_check = new TH1D("hadron_check", "Hadron phi", 2000, -5, 5);
     hadron_check->Sumw2();
 
     D_phi = new TH1D("D_phi", "D phi", 2000, -5, 5);

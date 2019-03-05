@@ -46,7 +46,6 @@ void runPicoD0AnaMakerLocal(
   // -- Set Base cuts for HF analysis
 
   // -- File name of bad run list
-  hfCuts->setBadRunListFileName(badRunListFileName);
 
   hfCuts->setCutVzMax(6.);
   hfCuts->setCutVzVpdVzMax(6.);
