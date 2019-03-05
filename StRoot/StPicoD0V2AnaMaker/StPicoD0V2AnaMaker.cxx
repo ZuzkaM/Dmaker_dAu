@@ -83,7 +83,7 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 // _________________________________________________________
 void StPicoD0V2AnaMaker::DeclareHistograms() {
     TString names[4] = {"cos_B", "cos_F", "sin_B", "sin_F"}; //backward and forward samples
-//    float multBin[6] = {0, 7, 12, 16, 22, 100};
+    float multBin[6] = {0, 7, 12, 16, 22, 100};
     int nMultBins = sizeof(multBin)/sizeof(multBin[0])-1;
 
     float momBins[4] = {1,2,3,5};
@@ -125,7 +125,13 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     sinH = new TProfile("ImQ", "Im Q", 1, 0, 100);
 
     hadron_phi = new TH1D("hadron_phi", "Hadron phi", 2000, -5, 5);
+    hadron_phi->Sumw2();
+
+    hadron_check = hadron_phi = new TH1D("hadron_check", "Hadron phi", 2000, -5, 5);
+    hadron_check->Sumw2();
+
     D_phi = new TH1D("D_phi", "D phi", 2000, -5, 5);
+    D_phi->Sumw2();
 
     hadron_phi_etaP = new TH1D("hadron_phi_etaP", "Hadron phi, eta > 0", 2000, -5, 5);
     D_phi_etaP = new TH1D("D_phi_etaP", "D phi, eta > 0", 2000, -5, 5);
@@ -135,6 +141,12 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
 
     diFlowMass = new TProfile("diFlowMass", "d2 D0 vs. m_inv; m_inv; d_2", 200, 1.75, 1.95);
     diFlowMassBKG = new TProfile("diFlowMassBKG", "d2 D0 vs. m_inv - wrong sign; m_inv; d_2", 200, 1.75, 1.95);
+
+    for(int pT = 0; pT < nMomBins; pT++){
+        for(int mult = 0; mult < 5; mult++){
+            mass[pT][mult] = new TH1D(Form("Mass_pT_%.0f_%0.f_mult_%.0f_%0.f", momBins[pT], momBins[pT+1], multBin[mult], multBin[mult+1]), "Mass of K pi pair", 200, 1.804, 1.924);
+        }
+    }
 }
 
 // _________________________________________________________
@@ -166,6 +178,7 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
     dirFlow2BKG->Write();
 
     hadron_phi->Write();
+    hadron_check->Write();
     D_phi->Write();
 
     hadron_phi_etaP->Write();
@@ -179,12 +192,25 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 
     diFlowMass->Write();
     diFlowMassBKG->Write();
+
+    for(int pT = 0; pT < nMomBins; pT++){
+        for(int mult = 0; mult < 5; mult++){
+            mass[pT][mult]->Write();
+        }
+    }
 }
 
 // _________________________________________________________
 bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 	std::vector<int> tracksToRemove = createCandidates();
-	
+
+    TFile *fileW=new TFile("weight.root");
+    if((!fileW) || (!fileW->IsOpen())) printf("file does not exist");
+    weights = (TH1D *)fileW->Get("hadron_phi");
+
+    double maxNentries = weights->GetMaximum();
+    double weightHadron = 1;
+
 	double etaGap[3] = {0,0.15,0.05};
     double mEtaGap = etaGap[idxGap];
     float hadronFill[7] = {0};
@@ -203,22 +229,25 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 
         if(containsId(hadron->id(), tracksToRemove)) continue;
 
+        weightHadron = maxNentries/(weights->GetBinContent( weights->FindBin(phiHadron) ));
+
         Qvec[0]++;
         Qvec[1] += cos(2 * phiHadron);
         Qvec[2] += sin(2 * phiHadron);
 
         if(etaHadron<-0.5*mEtaGap) {//backward sample
-            hadronFill[0]++;
-            hadronFill[1] += sin(2 * phiHadron);
-            hadronFill[2] += cos(2 * phiHadron);
+            hadronFill[0] += weightHadron;
+            hadronFill[1] += weightHadron*sin(2 * phiHadron);
+            hadronFill[2] += weightHadron*cos(2 * phiHadron);
         }
 
         if(etaHadron>0.5*mEtaGap) {//forward sample
-            hadronFill[3]++;
-            hadronFill[4] += sin(2 * phiHadron);
-            hadronFill[5] += cos(2 * phiHadron);
+            hadronFill[3] += weightHadron;
+            hadronFill[4] += weightHadron*sin(2 * phiHadron);
+            hadronFill[5] += weightHadron*cos(2 * phiHadron);
         }
         hadron_phi->Fill(phiHadron);
+        hadron_check->Fill(phiHadron, weightHadron);
         if(etaHadron>0) hadron_phi_etaP->Fill(phiHadron);
         if(etaHadron<0) hadron_phi_etaN->Fill(phiHadron);
     }
@@ -262,6 +291,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
     double hadronv2=1;
 //    float multBin[6] = {0,7,12,16,22,100};
     double etaGap[3] = {0,0.15,0.05};
+    float momBins[4] = {1,2,3,5};
 
     int k=0;
     double corFill[7] = {0};
@@ -291,6 +321,9 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
                     corrD[0][m]->Fill(kp->pt(), corFill[2], weight);
                     corrD[1][m]->Fill(kp->pt(), corFill[1], weight);
                     dirFlow[m]->Fill(kp->pt(), corFill[2] * corFill[5] / corFill[3], weight);
+                    for (int pT = 0; pT < 3; pT++) {
+                        if(kp->pt() >= momBins[pT] && kp->pt() < momBins[pT+1]) mass[pT][m]->Fill( kp->m() );
+                    }
                 }
             }
 
@@ -321,6 +354,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
                     corrDBKG[0][m]->Fill(kp->pt(), corFill[2], weight);
                     corrDBKG[1][m]->Fill(kp->pt(), corFill[1], weight);
                     dirFlowBKG[m]->Fill(kp->pt(), corFill[2] * corFill[5] / corFill[3], weight);
+
                 }
             }
 

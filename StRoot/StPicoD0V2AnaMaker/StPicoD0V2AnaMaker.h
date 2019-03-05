@@ -97,6 +97,11 @@ private:
     TProfile *sinH;
     TProfile *diFlowMass;
     TProfile *diFlowMassBKG;
+
+    TH1D *weights;
+    TH1D *hadron_check;
+
+    TH1D *mass[3][5];
  
 
     bool getHadronCorV2(int );

@@ -260,16 +260,16 @@ void flow()
 			}
 
 	//lame pic is coming
-	TLegend *legend = new TLegend(0.1,0.7,0.48,0.9);
-	legend->SetHeader("v2 D0 analysis","C");
+	//TLegend *legend = new TLegend(0.1,0.7,0.48,0.9);
+	//legend->SetHeader("v2 D0 analysis","C");
 
-	v2_all_mult_noC_BKG->Draw();
-	v2_all_mult_noC->SetLineColor(kRed);
-	v2_all_mult_noC->Draw("same");
+	//v2_all_mult_noC_BKG->Draw();
+	//v2_all_mult_noC->SetLineColor(kRed);
+	v2_all_mult_noC->Draw();
 
-	legend->AddEntry(v2_all_mult_noC_BKG,"Pure bkg (wrong sign)","f");
-	legend->AddEntry(v2_all_mult_noC,"Total (right sign)","f");
-	legend->Draw("same");
+	//legend->AddEntry(v2_all_mult_noC_BKG,"Pure bkg (wrong sign)","f");
+	//legend->AddEntry(v2_all_mult_noC,"Total (right sign)","f");
+	//legend->Draw("same");
 
 	//v2_D0->Draw();
 
