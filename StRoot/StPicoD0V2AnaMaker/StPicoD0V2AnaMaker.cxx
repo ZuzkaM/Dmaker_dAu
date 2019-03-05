@@ -142,7 +142,7 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     diFlowMass = new TProfile("diFlowMass", "d2 D0 vs. m_inv; m_inv; d_2", 200, 1.75, 1.95);
     diFlowMassBKG = new TProfile("diFlowMassBKG", "d2 D0 vs. m_inv - wrong sign; m_inv; d_2", 200, 1.75, 1.95);
 
-    for(int pT = 0; pT < nMomBins; pT++){
+    for(int pT = 0; pT < 3; pT++){
         for(int mult = 0; mult < 5; mult++){
             mass[pT][mult] = new TH1D(Form("Mass_pT_%.0f_%0.f_mult_%.0f_%0.f", momBins[pT], momBins[pT+1], multBin[mult], multBin[mult+1]), "Mass of K pi pair", 200, 1.804, 1.924);
         }
