@@ -300,7 +300,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         qVecPow2[1]->Fill(mult, (hadronFill[5]*hadronFill[5])/(hadronFill[3]*hadronFill[3]), reweight);
         qVecPow2[2]->Fill(mult, (hadronFill[1]*hadronFill[1])/(hadronFill[0]*hadronFill[0]), reweight);
         qVecPow2[3]->Fill(mult, (hadronFill[4]*hadronFill[4])/(hadronFill[3]*hadronFill[3]), reweight);
-        double c22 = (QvectorB[1]*(TComplex::Conjugate(QvectorF[1]))).Re();
+        double c22 = (QvectorB[1]*(TComplex::Conjugate(*QvectorF[1]))).Re();
         refFlow->Fill(mult, (c22/(hadronFill[0]*hadronFill[3])), reweight);
         //no mult
         qVec2[0]->Fill(mult, hadronFill[2]/hadronFill[0], reweight);
