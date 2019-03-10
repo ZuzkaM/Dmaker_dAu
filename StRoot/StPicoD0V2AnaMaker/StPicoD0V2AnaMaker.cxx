@@ -5,6 +5,7 @@
 #include "StPicoHFMaker/StHFCuts.h"
 #include "phys_constants.h"
 #include "StPicoD0V2AnaMaker.h"
+#include "TComplex.h"
 ClassImp(StPicoD0V2AnaMaker)
 
 float multBin[6] = {0,7,12,16,22,100};
