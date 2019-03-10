@@ -104,10 +104,6 @@ private:
 
     TH1D *mass[3][5];
 
-    //from KKG
-    TComplex *QvectorF[3];
-    TComplex *QvectorB[3];
- 
 
     bool getHadronCorV2(int );
     bool getCorV2(StHFPair *, double, int);
