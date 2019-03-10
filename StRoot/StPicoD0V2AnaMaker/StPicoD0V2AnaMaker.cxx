@@ -279,8 +279,8 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
     //filling real and imaginary part of Q vector
     for(int ipow = 0; ipow < 3; ipow++)
     {
-        QvectorB[ipow] = TComplex(QcosB[ipow], QsinB[ipow]);
-        QvectorF[ipow] = TComplex(QcosF[ipow], QsinF[ipow]);
+        QvectorB[ipow] = new TComplex(QcosB[ipow], QsinB[ipow]);
+        QvectorF[ipow] = new TComplex(QcosF[ipow], QsinF[ipow]);
     }
 
     hadronFill[6] = mult;
