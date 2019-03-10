@@ -4,6 +4,7 @@
 #include "StPicoHFMaker/StPicoHFMaker.h"
 #include "TNtuple.h"
 #include "TVector3.h"
+#include "TComplex.h"
 
 //#include "StRefMultCorr/StRefMultCorr.h"
 #include "TH2F.h"
@@ -102,6 +103,10 @@ private:
     TH1D *hadron_check;
 
     TH1D *mass[3][5];
+
+    //from KKG
+    TComplex *QvectorF[3];
+    TComplex *QvectorB[3];
  
 
     bool getHadronCorV2(int );
