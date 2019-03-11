@@ -146,8 +146,8 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     diFlowMassBKG = new TProfile("diFlowMassBKG", "d2 D0 vs. m_inv - wrong sign; m_inv; d_2", 200, 1.75, 1.95);
 
     for(int pT = 0; pT < 3; pT++){
-        mass[pT] = new TH1D(Form("Mass_pT_%.0f_%0.f", momBins[pT], momBins[pT+1], "Mass of K pi pair - US", 2000, 0.4, 2.4);
-        massBKG[pT] = new TH1D(Form("Mass_BKG_pT_%.0f_%0.f", momBins[pT], momBins[pT+1], "Mass of K pi pair - LS", 2000, 0.4, 2.4);
+        mass[pT] = new TH1D(Form("Mass_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "Mass of K pi pair - US", 2000, 0.4, 2.4);
+        massBKG[pT] = new TH1D(Form("Mass_BKG_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "Mass of K pi pair - LS", 2000, 0.4, 2.4);
     }
 
     NtracksFvsCum = new TProfile("NtracksFvsCum", "NtracksFvsCum", 100, 0, 100);
@@ -384,7 +384,6 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
             diFlowMass->Fill(kp->m(), dif22/(weightDcan*corFill[3]), weight);
 
         }
-    }
     else{
         corFill[1] = weightDcan*sin(2 * kp->phi());
         corFill[2] = weightDcan*cos(2 * kp->phi());
