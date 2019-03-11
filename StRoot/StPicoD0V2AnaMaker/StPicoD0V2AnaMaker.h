@@ -82,7 +82,6 @@ private:
     TProfile *candPt;
 
     TProfile *qVec[4];
-    TProfile *qVecPow2[4];
     TProfile *refFlow;
     TProfile *dirFlow[5];
     TProfile *corrD[2][5];
@@ -102,8 +101,11 @@ private:
     TH1D *weights;
     TH1D *hadron_check;
 
-    TH1D *mass[3][5];
+    TH1D *mass[3];
+    TH1D *massBKG[3];
 
+    TProfile *NtracksFvsCum;
+    TProfile *NtracksBvsCum;
 
     bool getHadronCorV2(int );
     bool getCorV2(StHFPair *, double, int);
