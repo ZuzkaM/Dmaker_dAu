@@ -96,8 +96,8 @@ private:
     TProfile *dirFlow2BKG;
     TProfile *cosH;
     TProfile *sinH;
-    TProfile *diFlowMass;
-    TProfile *diFlowMassBKG;
+    TProfile *diFlowMass[3];
+    TProfile *diFlowMassBKG[3];
 
     TH1D *weights;
     TH1D *hadron_check;
