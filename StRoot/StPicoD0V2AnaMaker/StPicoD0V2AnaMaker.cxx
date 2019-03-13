@@ -122,6 +122,7 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     dirFlow2BKG= new TProfile("dirFlow_no_mult_BKG","dir flow _BKG", nMomBins, momBins);
 
     refFlow = new TProfile("refFlow", "", nMultBins, multBin);
+    refFlow_noC = new TProfile("refFlow_noC", "", nMultBins, multBin); //just to compare c22 with & withouth weights
     refFlow2 = new TProfile("refFlow_no_mult", "", 1, 0, 100);
 
     cosH = new TProfile("ReQ", "Re Q", 1, 0, 100);
@@ -152,6 +153,8 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
 
     NtracksFvsCum = new TProfile("NtracksFvsCum", "NtracksFvsCum", 100, 0, 100);
     NtracksBvsCum = new TProfile("NtracksBvsCum", "NtracksBvsCum", 100, 0, 100);
+
+    phiVsEta = new TH2D("phiVsEta", "phi vs. eta of charged hadrons", 2000, -5, 5,80, -2, 2);
 }
 
 // _________________________________________________________
@@ -161,6 +164,7 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
         qVec2[m]->Write();
     }
     refFlow->Write();
+    refFlow_noC->Write();
 
     for(int m = 0; m < 5; m++) {
         corrD[0][m]->Write();
@@ -204,6 +208,8 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 
     NtracksBvsCum->Write();
     NtracksFvsCum->Write();
+
+    phiVsEta->Write();
 }
 
 // _________________________________________________________
@@ -219,15 +225,26 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
     double QsinF[3] = {0};
     double QsinB[3] = {0};
 
+    //no weights applied!
+    double QcosF_noC[3] = {0};
+    double QcosB_noC[3] = {0};
+    double QsinF_noC[3] = {0};
+    double QsinB_noC[3] = {0};
+
     double NtracksB = 0;
     double NtracksF = 0;
 
     TComplex QvectorF[3];
     TComplex QvectorB[3];
 
+    //no weights applied!
+    TComplex QvectorF_noC;
+    TComplex QvectorB_noC;
+
 	double etaGap[3] = {0,0.15,0.05};
     double mEtaGap = etaGap[idxGap];
     float hadronFill[7] = {0};
+    float hadronFill_noC[7] = {0};
     float Qvec[3] = {0};
     const double reweight = 1;//mGRefMultCorrUtil->getWeight();
     // int centrality  = mGRefMultCorrUtil->getCentralityBin9();
@@ -256,6 +273,9 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
             hadronFill[1] += weightHadron*sin(2 * phiHadron);
             hadronFill[2] += weightHadron*cos(2 * phiHadron);
             NtracksB++;
+            hadronFill_noC[0] += 1;
+            hadronFill_noC[1] += sin(2 * phiHadron);
+            hadronFill_noC[2] += cos(2 * phiHadron);
             for(int ipow = 0; ipow < 3; ipow++)
             {
                 QcosB[ipow] += TMath::Power(weightHadron, ipow)*TMath::Cos(2*phiHadron);
@@ -267,6 +287,9 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
             hadronFill[3] += weightHadron;
             hadronFill[4] += weightHadron*sin(2 * phiHadron);
             hadronFill[5] += weightHadron*cos(2 * phiHadron);
+            hadronFill_noC[3] += 1;
+            hadronFill_noC[4] += sin(2 * phiHadron);
+            hadronFill_noC[5] += cos(2 * phiHadron);
             NtracksF++;
             for(int ipow = 0; ipow < 3; ipow++)
             {
@@ -278,6 +301,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         hadron_check->Fill(phiHadron, weightHadron);
         if(etaHadron>0) hadron_phi_etaP->Fill(phiHadron);
         if(etaHadron<0) hadron_phi_etaN->Fill(phiHadron);
+        phiVsEta->Fill(phiHadron, etaHadron);
     }
 
 
@@ -287,6 +311,9 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         QvectorB[ipow] = TComplex(QcosB[ipow], QsinB[ipow]);
         QvectorF[ipow] = TComplex(QcosF[ipow], QsinF[ipow]);
     }
+
+    QvectorB_noC = TComplex(hadronFill_noC[2], hadronFill_noC[1]);
+    QvectorF_noC = TComplex(hadronFill_noC[5], hadronFill_noC[4]);
 
     hadronFill[6] = mult;
     hadronFill[7] = reweight;
@@ -304,6 +331,9 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 
         double c22 = (QvectorB[1]*(TComplex::Conjugate(QvectorF[1]))).Re();
         refFlow->Fill(mult, (c22/(hadronFill[0]*hadronFill[3])), reweight);
+        //no weights
+        c22 = (QvectorB_noC*(TComplex::Conjugate(QvectorF_noC))).Re();
+        refFlow_noC->Fill(mult, (c22/(hadronFill_noC[0]*hadronFill_noC[3])), reweight);
         //no mult
         qVec2[0]->Fill(mult, hadronFill[2]/hadronFill[0], reweight);
         qVec2[1]->Fill(mult, hadronFill[5]/hadronFill[3], reweight);
@@ -414,7 +444,9 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
 
                 }
             }
-
+            for (int pT = 0; pT < 3; pT++) {
+                if(kp->pt() >= momBins[pT] && kp->pt() < momBins[pT+1]) massBKG[pT]->Fill( kp->m() );
+            }
             corrD2BKG[0]->Fill(kp->pt(), corFill[2], weight);
             corrD2BKG[1]->Fill(kp->pt(), corFill[1], weight);
             dirFlow2BKG->Fill(kp->pt(), dif22/(weightDcan*corFill[3]), weight);
