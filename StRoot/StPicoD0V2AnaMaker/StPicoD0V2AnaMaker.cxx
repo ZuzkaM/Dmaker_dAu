@@ -76,10 +76,10 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
             if((kaon->charge() + pion1->charge() != 0) ) charge = 1;
 
             for (int pT = 0; pT < 3; pT++) {
-                if(kp->pt() >= momBins[pT] && kp->pt() < momBins[pT+1])
+                if(pair->pt() >= momBins[pT] && pair->pt() < momBins[pT+1])
                 {
-                    if(charge == 0) mass[pT]->Fill( kp->m() );
-                    else massBKG[pT]->Fill( kp->m() );
+                    if(charge == 0) mass[pT]->Fill( pair->m() );
+                    else massBKG[pT]->Fill( pair->m() );
                 }
             }
 
