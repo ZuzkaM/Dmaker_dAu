@@ -56,6 +56,8 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
 	std::vector<int> tracksofCand;
 
+    float momBins[4] = {1,2,3,5};
+
     for(unsigned int i=0;i<mPicoDst->numberOfTracks();i++)  {
         StPicoTrack const* pion1 = mPicoDst->track(i);
         if (!mHFCuts -> isGoodPion(pion1)) continue;
