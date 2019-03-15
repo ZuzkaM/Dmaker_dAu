@@ -66,15 +66,25 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
             if (!mHFCuts -> isGoodKaon(kaon)) continue;
             StHFPair *pair = new StHFPair(pion1, kaon, mHFCuts->getHypotheticalMass(StPicoCutsBase::kPion),mHFCuts->getHypotheticalMass(StPicoCutsBase::kKaon), i, j, mPrimVtx, mBField, kTRUE); //the order (pion1, kaon) needs to stay same!
             if (!mHFCuts->isGoodSecondaryVertexPair(pair)) continue;
-            if(pair->m() < 1.804 || pair->m() > 1.924 || pair->pt() < 1 || pair->pt() > 5) continue;
-			if (!mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) continue;
-			if (pair->eta() < 0.075 && pair->eta() > -0.075) continue; //eta gap
+            if (!mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) continue;
+            if(pair->pt() < 1 || pair->pt() > 5) continue;
+            if(pair->m() < 0.4 || pair->m() > 2.4) continue;
 
-			int charge = 0;
+            int charge = 0;
             if((kaon->charge() + pion1->charge() != 0) ) charge = 1;
 
-			getCorV2(pair, 1, charge);
+            for (int pT = 0; pT < 3; pT++) {
+                if(kp->pt() >= momBins[pT] && kp->pt() < momBins[pT+1])
+                {
+                    if(charge == 0) mass[pT]->Fill( kp->m() );
+                    else massBKG[pT]->Fill( kp->m() );
+                }
+            }
 
+            if(pair->m() < 1.804 || pair->m() > 1.924) continue;
+			if (pair->eta() < 0.075 && pair->eta() > -0.075) continue; //eta gap
+
+			getCorV2(pair, 1, charge);
 
 			tracksofCand.push_back(pion1->id());
 			tracksofCand.push_back(kaon->id());
@@ -147,7 +157,9 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
 
     for(int pT = 0; pT < 3; pT++){
         mass[pT] = new TH1D(Form("Mass_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "Mass of K pi pair - US", 2000, 0.4, 2.4);
+        mass[pT]->Sumw2();
         massBKG[pT] = new TH1D(Form("Mass_BKG_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "Mass of K pi pair - LS", 2000, 0.4, 2.4);
+        massBKG[pT]->Sumw2();
 
         diFlowMass[pT] = new TProfile(Form("diFlowMass_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "d2 D0 vs. m_inv; m_inv; d_2", 200, 1.75, 1.95);
         diFlowMassBKG[pT] = new TProfile(Form("diFlowMassBKG_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "d2 D0 vs. m_inv - wrong sign; m_inv; d_2", 200, 1.75, 1.95);
