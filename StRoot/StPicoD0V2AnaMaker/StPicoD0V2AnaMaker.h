@@ -107,8 +107,10 @@ private:
 
     TProfile *NtracksFvsCum;
     TProfile *NtracksBvsCum;
+    TH2D *NtracksBvsF;
 
     TH2D *phiVsEta;
+    TH2D *phiVsEtaDcand;
 
     bool getHadronCorV2(int );
     bool getCorV2(StHFPair *, double, int);

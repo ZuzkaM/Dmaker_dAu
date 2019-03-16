@@ -70,7 +70,6 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
             if (!mHFCuts->isGoodSecondaryVertexPair(pair)) continue;
             if (!mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) continue;
             if(pair->pt() < 1 || pair->pt() > 5) continue;
-            if(pair->m() < 0.4 || pair->m() > 2.4) continue;
 
             int charge = 0;
             if((kaon->charge() + pion1->charge() != 0) ) charge = 1;
@@ -90,7 +89,6 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
 			tracksofCand.push_back(pion1->id());
 			tracksofCand.push_back(kaon->id());
-
 
         }  // for (unsigned short idxKaon = 0; idxKaon < mIdxPicoKaons.size(); ++idxKaon)
     } // for (unsigned short idxPion1 = 0; idxPion1 < mIdxPicoPions.size(); ++idxPion1)
@@ -170,7 +168,10 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     NtracksFvsCum = new TProfile("NtracksFvsCum", "NtracksFvsCum", 100, 0, 100);
     NtracksBvsCum = new TProfile("NtracksBvsCum", "NtracksBvsCum", 100, 0, 100);
 
-    phiVsEta = new TH2D("phiVsEta", "phi vs. eta of charged hadrons", 2000, -5, 5,80, -2, 2);
+    NtracksBvsF = new TH2D("NtracksBvsF", "", 100, 0, 100, 100, 0, 100);
+
+    phiVsEta = new TH2D("phiVsEta", "phi vs. eta of charged hadrons", 1000, -5, 5,40, -2, 2);
+    phiVsEtaDcand = new TH2D("phiVsEtaDcand", "phi vs. eta of D candidates", 1000, -5, 5,40, -2, 2);
 }
 
 // _________________________________________________________
@@ -225,6 +226,8 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 
     NtracksBvsCum->Write();
     NtracksFvsCum->Write();
+
+    NtracksBvsF->Write();
 
     phiVsEta->Write();
 }
@@ -357,8 +360,10 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         sinH->Fill(mult, Qvec[2]/Qvec[0]);
 
         //Ntracks vs cumulant
-        NtracksBvsCum->Fill(NtracksB, c22);
-        NtracksFvsCum->Fill(NtracksF, c22);
+        NtracksBvsCum->Fill(NtracksB, c22/(hadronFill_noC[0]*hadronFill_noC[3]));
+        NtracksFvsCum->Fill(NtracksF, c22/(hadronFill_noC[0]*hadronFill_noC[3]));
+
+        NtracksBvsF->Fill(NtracksB, NtracksF);
     }
 
     return true;
