@@ -230,6 +230,7 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
     NtracksBvsF->Write();
 
     phiVsEta->Write();
+    phiVsEtaDcand->Write();
 }
 
 // _________________________________________________________
