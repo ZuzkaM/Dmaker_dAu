@@ -112,6 +112,9 @@ private:
     TH2D *phiVsEta;
     TH2D *phiVsEtaDcand;
 
+    //TMVA
+    TH1F *histBdt(0);
+
     bool getHadronCorV2(int );
     bool getCorV2(StHFPair *, double, int);
     bool isEtaGap(double, double ,double);

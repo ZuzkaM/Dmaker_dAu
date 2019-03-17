@@ -6,6 +6,9 @@
 #include "phys_constants.h"
 #include "StPicoD0V2AnaMaker.h"
 #include "TComplex.h"
+
+using namespace TMVA;
+
 ClassImp(StPicoD0V2AnaMaker)
 
 float multBin[6] = {0,7,12,16,22,100};
@@ -58,6 +61,59 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
     float momBins[4] = {1,2,3,5};
 
+
+
+    /*****
+     *
+     *  TMVA
+     *
+     *****/
+
+    TMVA::Tools::Instance();
+    std::map<std::string,int> Use;
+
+    // --- Boosted Decision Trees
+    Use["BDT"]             = 1; // uses Adaptive Boost
+
+    std::cout << std::endl;
+
+    TMVA::Reader *reader = new TMVA::Reader( "!Color:!Silent" );
+    Float_t k_pt, pi1_pt, k_dca, pi1_dca, dcaDaughters, cosTheta, D_decayL, dcaD0ToPv;
+    reader->AddVariable("k_dca", &k_dca );
+    reader->AddVariable("pi1_dca", &pi1_dca );
+    reader->AddVariable("dcaDaughters", &dcaDaughters );
+    reader->AddVariable("cosTheta", &cosTheta  );
+    reader->AddVariable("D_decayL", &D_decayL );
+    reader->AddVariable("dcaD0ToPv", &dcaD0ToPv );
+
+    TString dir    = "dataset/weights/";
+    TString prefix = "TMVAClassification";
+
+    // Book method(s)
+    for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) {
+        if (it->second) {
+            TString methodName = TString(it->first) + TString(" method");
+            TString weightfile = dir + prefix + TString("_") + TString(it->first) + TString(".weights.xml");
+            reader->BookMVA( methodName, weightfile );
+        }
+    }
+
+    //tmva input cuts
+    float const dcaV0ToPvCons = 0.05;
+    float const decayLengthCons = 0.0005; //0.0005
+    float const cosThetaCons = 0.5;
+    float const dcaDaughtersCons = 0.02;
+    float const kDca = 0.002;
+    float const pDca = 0.002;
+    float const minPt = 0.15;
+
+    /*****
+    *
+    *  TMVA intro ends here!
+    *
+    *****/
+
+    //loop - all particles
     for(unsigned int i=0;i<mPicoDst->numberOfTracks();i++)  {
         StPicoTrack const* pion1 = mPicoDst->track(i);
         if (!mHFCuts -> isGoodPion(pion1)) continue;
@@ -66,13 +122,38 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
             StPicoTrack const* kaon = mPicoDst->track(j);
             if (pion1->id() == kaon->id()) continue;
             if (!mHFCuts -> isGoodKaon(kaon)) continue;
+
             StHFPair *pair = new StHFPair(pion1, kaon, mHFCuts->getHypotheticalMass(StPicoCutsBase::kPion),mHFCuts->getHypotheticalMass(StPicoCutsBase::kKaon), i, j, mPrimVtx, mBField, kTRUE); //the order (pion1, kaon) needs to stay same!
-            if (!mHFCuts->isGoodSecondaryVertexPair(pair)) continue;
-            if (!mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) continue;
+
             if(pair->pt() < 1 || pair->pt() > 5) continue;
 
             int charge = 0;
             if((kaon->charge() + pion1->charge() != 0) ) charge = 1;
+
+            //assigning TMVA variables to those used in picos
+            k_pt = kaon->gPt();
+            pi1_pt = pion1->gPt();
+            k_dca = pair->particle2Dca();
+            pi1_dca = pair->particle1Dca();
+            D_decayL = pair->decayLength();
+            cosTheta = cos(pair->pointingAngle());
+            dcaD0ToPv = pair->DcaToPrimaryVertex();
+            dcaDaughters = pair->dcaDaughters();
+
+            if  (k_pt>minPt && pi1_pt>minPt && D_decayL>decayLengthCons && D_decayL<0.2 &&
+                 dcaDaughters<dcaDaughtersCons && k_dca>kDca && k_dca<0.2 &&
+                 pi1_dca>pDca && pi1_dca<0.2 && dcaD0ToPv < dcaV0ToPvCons && cosTheta > cosThetaCons) {
+
+                if (Use["BDT"]) {
+                    float valueMVA = reader->EvaluateMVA("BDT method");
+                    histBdt->Fill(valueMVA);
+                    //SOMETHING V2 RELATED WILL BE HERE :D
+                }
+
+
+            //classic cuts
+            if (!mHFCuts->isGoodSecondaryVertexPair(pair)) continue;
+            if (!mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) continue;
 
             for (int pT = 0; pT < 3; pT++) {
                 if(pair->pt() >= momBins[pT] && pair->pt() < momBins[pT+1])
@@ -172,6 +253,8 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
 
     phiVsEta = new TH2D("phiVsEta", "phi vs. eta of charged hadrons", 1000, -5, 5,40, -2, 2);
     phiVsEtaDcand = new TH2D("phiVsEtaDcand", "phi vs. eta of D candidates", 1000, -5, 5,40, -2, 2);
+
+    histBdt = new TH1F("MVA_BDT","MVA_BDT", 100, -1, 1 );
 }
 
 // _________________________________________________________
@@ -231,6 +314,8 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 
     phiVsEta->Write();
     phiVsEtaDcand->Write();
+
+    histBdt->Write();
 }
 
 // _________________________________________________________
@@ -346,9 +431,6 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 
         double c22 = (QvectorB[1]*(TComplex::Conjugate(QvectorF[1]))).Re();
         refFlow->Fill(mult, (c22/(hadronFill[0]*hadronFill[3])), reweight);
-        //no weights
-        c22 = (QvectorB_noC*(TComplex::Conjugate(QvectorF_noC))).Re();
-        refFlow_noC->Fill(mult, (c22/(hadronFill_noC[0]*hadronFill_noC[3])), reweight);
         //no mult
         qVec2[0]->Fill(mult, hadronFill[2]/hadronFill[0], reweight);
         qVec2[1]->Fill(mult, hadronFill[5]/hadronFill[3], reweight);
@@ -365,6 +447,11 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         NtracksFvsCum->Fill(NtracksF, c22/(hadronFill_noC[0]*hadronFill_noC[3]));
 
         NtracksBvsF->Fill(NtracksB, NtracksF);
+
+        //no weights
+        c22 = (QvectorB_noC*(TComplex::Conjugate(QvectorF_noC))).Re();
+        refFlow_noC->Fill(mult, (c22/(hadronFill_noC[0]*hadronFill_noC[3])), reweight);
+
     }
 
     return true;
@@ -397,6 +484,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
         D_phi->Fill(kp->phi());
         if (kp->eta() > 0) D_phi_etaP->Fill(kp->phi());
         if (kp->eta() < 0) D_phi_etaN->Fill(kp->phi());
+        phiVsEtaDcand->Fill(kp->phi(), kp->phi());
 
         for (unsigned int i = 0; i < mPicoDst->numberOfTracks(); i++) {
             StPicoTrack const *hadron = mPicoDst->track(i);
