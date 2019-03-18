@@ -77,6 +77,10 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
     TMVA::Reader *reader[3];
 
+    TString dir    = "/star/u/zuzana/zuzana/D0v2/Dmaker_dAu/StRoot/weights/";
+    TString prefix = "TMVAClassification";
+    TString ptbin[3] = {"12", "23", "35"};
+
     Float_t k_pt[3], pi1_pt[3], k_dca[3], pi1_dca[3], dcaDaughters[3], cosTheta[3], D_decayL[3], dcaD0ToPv[3];
     for (int pT = 0; pT < 3; pT++) {
         reader[pT] = new TMVA::Reader( "!Color:!Silent" );
@@ -87,10 +91,6 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
         reader[pT]->AddVariable("D_decayL", &D_decayL[pT] );
         reader[pT]->AddVariable("dcaD0ToPv", &dcaD0ToPv[pT] );
 
-
-        TString dir    = "/star/u/zuzana/zuzana/D0v2/Dmaker_dAu/StRoot/weights/";
-        TString prefix = "TMVAClassification";
-        TString ptbin[3] = {"12", "23", "35"};
 
         // Book method(s)
         for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) {
@@ -112,6 +112,7 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
     float const kDca = 0.002;
     float const pDca = 0.002;
     float const minPt = 0.15;
+    //from Lukas's ana
     float const bdtCuts[3] = {0.365, 0.299, 0.288};
     float const meanFit[3] = {1.866, 1.863, 1.864};
     float const sigmaFit[3] = {0.0137, 0.0131, 0.0234};
