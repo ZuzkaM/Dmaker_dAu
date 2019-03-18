@@ -7,6 +7,10 @@
 #include "StPicoD0V2AnaMaker.h"
 #include "TComplex.h"
 
+#include "TMVA/Tools.h"
+#include "TMVA/Reader.h"
+#include "TMVA/MethodCuts.h"
+
 using namespace TMVA;
 
 ClassImp(StPicoD0V2AnaMaker)
