@@ -163,8 +163,6 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
                 if (Use["BDT"]) {
                     float valueMVA = reader[pTbin]->EvaluateMVA("BDT method");
-                    histBdt->Fill(valueMVA);
-
                     if(valueMVA < bdtCuts[pTbin]) continue;
 
                     if(charge == 0) mass[pTbin]->Fill( pair->m() );
@@ -265,7 +263,6 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     phiVsEta = new TH2D("phiVsEta", "phi vs. eta of charged hadrons", 1000, -5, 5,40, -2, 2);
     phiVsEtaDcand = new TH2D("phiVsEtaDcand", "phi vs. eta of D candidates", 1000, -5, 5,40, -2, 2);
 
-    histBdt = new TH1F("MVA_BDT","MVA_BDT", 100, -1, 1 );
 }
 
 // _________________________________________________________
@@ -326,7 +323,6 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
     phiVsEta->Write();
     phiVsEtaDcand->Write();
 
-    histBdt->Write();
 }
 
 // _________________________________________________________
