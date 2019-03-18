@@ -75,28 +75,34 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
     // --- Boosted Decision Trees
     Use["BDT"]             = 1; // uses Adaptive Boost
 
-    std::cout << std::endl;
+    TMVA::Reader *reader[3];
 
-    TMVA::Reader *reader = new TMVA::Reader( "!Color:!Silent" );
-    Float_t k_pt, pi1_pt, k_dca, pi1_dca, dcaDaughters, cosTheta, D_decayL, dcaD0ToPv;
-    reader->AddVariable("k_dca", &k_dca );
-    reader->AddVariable("pi1_dca", &pi1_dca );
-    reader->AddVariable("dcaDaughters", &dcaDaughters );
-    reader->AddVariable("cosTheta", &cosTheta  );
-    reader->AddVariable("D_decayL", &D_decayL );
-    reader->AddVariable("dcaD0ToPv", &dcaD0ToPv );
+    Float_t k_pt[3], pi1_pt[3], k_dca[3], pi1_dca[3], dcaDaughters[3], cosTheta[3], D_decayL[3], dcaD0ToPv[3];
+    for (int pT = 0; pT < 3; pT++) {
+        reader[pT] = new TMVA::Reader( "!Color:!Silent" );
+        reader[pT]->AddVariable("k_dca", &k_dca[pT] );
+        reader[pT]->AddVariable("pi1_dca", &pi1_dca[pT] );
+        reader[pT]->AddVariable("dcaDaughters", &dcaDaughters[pT] );
+        reader[pT]->AddVariable("cosTheta", &cosTheta[pT]  );
+        reader[pT]->AddVariable("D_decayL", &D_decayL[pT] );
+        reader[pT]->AddVariable("dcaD0ToPv", &dcaD0ToPv[pT] );
 
-    TString dir    = "dataset/weights/";
-    TString prefix = "TMVAClassification";
 
-    // Book method(s)
-    for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) {
-        if (it->second) {
-            TString methodName = TString(it->first) + TString(" method");
-            TString weightfile = dir + prefix + TString("_") + TString(it->first) + TString(".weights.xml");
-            reader->BookMVA( methodName, weightfile );
+        TString dir    = "/star/u/zuzana/zuzana/D0v2/Dmaker_dAu/StRoot/weights/";
+        TString prefix = "TMVAClassification";
+        TString ptbin[3] = {"12", "23", "35"};
+
+        // Book method(s)
+        for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) {
+            if (it->second) {
+                TString methodName = TString(it->first) + TString(" method");
+                TString weightfile = dir + prefix + TString("_") + TString(it->first) + TString(".weights.pt") + ptbin[pT] + TString(".xml");
+                reader[pT]->BookMVA( methodName, weightfile );
+            }
         }
     }
+
+
 
     //tmva input cuts
     float const dcaV0ToPvCons = 0.05;
@@ -106,6 +112,9 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
     float const kDca = 0.002;
     float const pDca = 0.002;
     float const minPt = 0.15;
+    float const bdtCuts[3] = {0.365, 0.299, 0.288};
+    float const meanFit[3] = {1.866, 1.863, 1.864};
+    float const sigmaFit[3] = {0.0137, 0.0131, 0.0234};
 
     /*****
     *
@@ -126,49 +135,50 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
             StHFPair *pair = new StHFPair(pion1, kaon, mHFCuts->getHypotheticalMass(StPicoCutsBase::kPion),mHFCuts->getHypotheticalMass(StPicoCutsBase::kKaon), i, j, mPrimVtx, mBField, kTRUE); //the order (pion1, kaon) needs to stay same!
 
             if(pair->pt() < 1 || pair->pt() > 5) continue;
+            if(pair->eta() < -1 || pair->eta() > 1) continue;
 
             int charge = 0;
             if((kaon->charge() + pion1->charge() != 0) ) charge = 1;
 
-            //assigning TMVA variables to those used in picos
-            k_pt = kaon->gPt();
-            pi1_pt = pion1->gPt();
-            k_dca = pair->particle2Dca();
-            pi1_dca = pair->particle1Dca();
-            D_decayL = pair->decayLength();
-            cosTheta = cos(pair->pointingAngle());
-            dcaD0ToPv = pair->DcaToPrimaryVertex();
-            dcaDaughters = pair->dcaDaughters();
-
-            if  (k_pt>minPt && pi1_pt>minPt && D_decayL>decayLengthCons && D_decayL<0.2 &&
-                 dcaDaughters<dcaDaughtersCons && k_dca>kDca && k_dca<0.2 &&
-                 pi1_dca>pDca && pi1_dca<0.2 && dcaD0ToPv < dcaV0ToPvCons && cosTheta > cosThetaCons) {
-
-                if (Use["BDT"]) {
-                    float valueMVA = reader->EvaluateMVA("BDT method");
-                    histBdt->Fill(valueMVA);
-                    //SOMETHING V2 RELATED WILL BE HERE :D
-                }
-
-
-            //classic cuts
-            if (!mHFCuts->isGoodSecondaryVertexPair(pair)) continue;
-            if (!mHFCuts->isGoodSecondaryVertexPairPtBin(pair)) continue;
-
+            int pTbin = 0;
             for (int pT = 0; pT < 3; pT++) {
-                if(pair->pt() >= momBins[pT] && pair->pt() < momBins[pT+1])
-                {
-                    if(charge == 0) mass[pT]->Fill( pair->m() );
-                    else massBKG[pT]->Fill( pair->m() );
-                }
+                if(pair->pt() >= momBins[pT] && pair->pt() < momBins[pT+1]) pTbin = pT;
             }
 
-            if(pair->m() < 1.804 || pair->m() > 1.924) continue;
-			if (pair->eta() < 0.075 && pair->eta() > -0.075) continue; //eta gap
 
-			getCorV2(pair, 1, charge);
+            //assigning TMVA variables to those used in picos
+            k_pt[pTbin] = kaon->gPt();
+            pi1_pt[pTbin] = pion1->gPt();
+            k_dca[pTbin] = pair->particle2Dca();
+            pi1_dca[pTbin] = pair->particle1Dca();
+            D_decayL[pTbin] = pair->decayLength();
+            cosTheta[pTbin] = cos(pair->pointingAngle());
+            dcaD0ToPv[pTbin] = pair->DcaToPrimaryVertex();
+            dcaDaughters[pTbin] = pair->dcaDaughters();
 
-			tracksofCand.push_back(pion1->id());
+            if  (k_pt[pTbin]>minPt && pi1_pt[pTbin]>minPt && D_decayL[pTbin]>decayLengthCons && D_decayL[pTbin]<0.2 &&
+                 dcaDaughters[pTbin]<dcaDaughtersCons && k_dca[pTbin]>kDca && k_dca[pTbin]<0.2 &&
+                 pi1_dca[pTbin]>pDca && pi1_dca[pTbin]<0.2 && dcaD0ToPv[pTbin] < dcaV0ToPvCons && cosTheta[pTbin] > cosThetaCons) {
+
+                if (Use["BDT"]) {
+                    float valueMVA = reader[pTbin]->EvaluateMVA("BDT method");
+                    histBdt->Fill(valueMVA);
+
+                    if(valueMVA < bdtCuts[pTbin]) continue;
+
+                    if(charge == 0) mass[pTbin]->Fill( pair->m() );
+                    else massBKG[pTbin]->Fill( pair->m() );
+
+                    //v2
+
+                    if(pair->m() < meanFit[pTbin] - 3*sigmaFit[pTbin] || pair->m() > meanFit[pTbin] + 3*sigmaFit[pTbin]) continue;
+                    if(pair->eta() < 0.075 && pair->eta() > -0.075) continue; //eta gap
+
+                    getCorV2(pair, 1, charge);
+
+                }
+
+        	tracksofCand.push_back(pion1->id());
 			tracksofCand.push_back(kaon->id());
 
         }  // for (unsigned short idxKaon = 0; idxKaon < mIdxPicoKaons.size(); ++idxKaon)
@@ -360,6 +370,8 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         float etaHadron = hadron->gMom().PseudoRapidity();
         float phiHadron = hadron->gMom().Phi();
 
+        if(etaHadron < -1 || etaHadron > 1) continue;
+
         if(containsId(hadron->id(), tracksToRemove)) continue;
 
         weightHadron = maxNentries/(weights->GetBinContent( weights->FindBin(phiHadron) ));
@@ -494,6 +506,8 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
             float etaHadron = hadron->gMom().PseudoRapidity();
             float phiHadron = hadron->gMom().Phi();
             double weightHadron = maxNentries / (weights->GetBinContent(weights->FindBin(phiHadron)));
+
+            if(etaHadron < -1 || etaHadron > 1) continue;
 
             if (!isEtaGap(kp->eta(), etaGap[k], etaHadron)) continue;
             corFill[3] += weightHadron;
