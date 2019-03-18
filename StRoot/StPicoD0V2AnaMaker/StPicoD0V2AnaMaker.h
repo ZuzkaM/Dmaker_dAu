@@ -28,6 +28,14 @@
 #include "TH3F.h"
 #include <ctime>
 
+
+#include "TMVA/Tools.h"
+#include "TMVA/Reader.h"
+#include "TMVA/MethodCuts.h"
+
+
+using namespace TMVA;
+
 class StPicoDst;
 class StPicoDstMaker;
 class StPicoEvent;
