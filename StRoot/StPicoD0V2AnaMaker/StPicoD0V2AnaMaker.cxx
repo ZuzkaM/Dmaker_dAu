@@ -65,8 +65,6 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
     float momBins[4] = {1,2,3,5};
 
-
-
     /*****
      *
      *  TMVA
@@ -179,6 +177,7 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
                     getCorV2(pair, 1, charge);
 
+                }
                 }
 
         	tracksofCand.push_back(pion1->id());
