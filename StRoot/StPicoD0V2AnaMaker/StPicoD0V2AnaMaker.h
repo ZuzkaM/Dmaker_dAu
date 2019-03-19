@@ -120,6 +120,11 @@ private:
     TH2D *phiVsEta;
     TH2D *phiVsEtaDcand;
 
+    TMVA::Reader *reader[3];
+    Float_t k_pt[3], pi1_pt[3], k_dca[3], pi1_dca[3], dcaDaughters[3], cosTheta[3], D_decayL[3], dcaD0ToPv[3];
+
+
+
 
     bool getHadronCorV2(int );
     bool getCorV2(StHFPair *, double, int);

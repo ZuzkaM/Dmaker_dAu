@@ -68,18 +68,12 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
      *****/
 
     TMVA::Tools::Instance();
-    std::map<std::string,int> Use;
 
-    // --- Boosted Decision Trees
-    Use["BDT"]             = 1; // uses Adaptive Boost
-
-    TMVA::Reader *reader[3];
 
     TString dir    = "/star/u/zuzana/zuzana/D0v2/Dmaker_dAu/StRoot/weights/";
     TString prefix = "TMVAClassification";
     TString ptbin[3] = {"12", "23", "35"};
 
-    Float_t k_pt[3], pi1_pt[3], k_dca[3], pi1_dca[3], dcaDaughters[3], cosTheta[3], D_decayL[3], dcaD0ToPv[3];
     for (int pT = 0; pT < 3; pT++) {
         reader[pT] = new TMVA::Reader( "!Color:!Silent" );
         reader[pT]->AddVariable("k_dca", &k_dca[pT] );
@@ -89,15 +83,10 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
         reader[pT]->AddVariable("D_decayL", &D_decayL[pT] );
         reader[pT]->AddVariable("dcaD0ToPv", &dcaD0ToPv[pT] );
 
+        TString methodName = "BDT method";
+        TString weightfile = dir + prefix + TString("_BDT.weights.pt") + ptbin[pT] + TString(".xml");
+        reader[pT]->BookMVA( methodName, weightfile );
 
-        // Book method(s)
-        for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) {
-            if (it->second) {
-                TString methodName = TString(it->first) + TString(" method");
-                TString weightfile = dir + prefix + TString("_") + TString(it->first) + TString(".weights.pt") + ptbin[pT] + TString(".xml");
-                reader[pT]->BookMVA( methodName, weightfile );
-            }
-        }
     }
 
 
@@ -159,7 +148,7 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
                  dcaDaughters[pTbin]<dcaDaughtersCons && k_dca[pTbin]>kDca && k_dca[pTbin]<0.2 &&
                  pi1_dca[pTbin]>pDca && pi1_dca[pTbin]<0.2 && dcaD0ToPv[pTbin] < dcaV0ToPvCons && cosTheta[pTbin] > cosThetaCons) {
 
-                if (Use["BDT"]) {
+                if (true) {
                     float valueMVA = reader[pTbin]->EvaluateMVA("BDT method");
                     if(valueMVA < bdtCuts[pTbin]) continue;
 
