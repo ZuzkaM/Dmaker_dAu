@@ -152,6 +152,7 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
                 if (true) {
                     float valueMVA = reader[pTbin]->EvaluateMVA("BDT method");
+                    cout << "Hodnota BDT response " << valueMVA << endl;
                     if(valueMVA < bdtCuts[pTbin]) continue;
 
                     if(charge == 0) mass[pTbin]->Fill( pair->m() );
