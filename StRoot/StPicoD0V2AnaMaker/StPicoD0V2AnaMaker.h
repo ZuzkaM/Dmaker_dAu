@@ -120,6 +120,22 @@ private:
     TH2D *phiVsEta;
     TH2D *phiVsEtaDcand;
 
+    //bins
+    float multBin[6] = {0,7,12,16,22,100};
+    float momBins[4] = {1,2,3,5};
+    //tmva input cuts
+    float const dcaV0ToPvCons = 0.05;
+    float const decayLengthCons = 0.0005; //0.0005
+    float const cosThetaCons = 0.5;
+    float const dcaDaughtersCons = 0.02;
+    float const kDca = 0.002;
+    float const pDca = 0.002;
+    float const minPt = 0.15;
+    //from Lukas's ana
+    float const bdtCuts[3] = {0.365, 0.299, 0.288};
+    float const meanFit[3] = {1.866, 1.863, 1.864};
+    float const sigmaFit[3] = {0.0137, 0.0131, 0.0234};
+
 
     bool getHadronCorV2(int );
     bool getCorV2(StHFPair *, double, int);
