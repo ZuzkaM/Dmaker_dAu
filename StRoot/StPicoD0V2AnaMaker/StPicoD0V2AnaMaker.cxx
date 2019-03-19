@@ -34,6 +34,28 @@ int StPicoD0V2AnaMaker::InitHF() {
     if((!fileW) || (!fileW->IsOpen())) printf("file does not exist");
     weights = (TH1D *)fileW->Get("hadron_phi");
 
+    TMVA::Tools::Instance();
+
+
+    TString dir    = "/star/u/zuzana/zuzana/D0v2/Dmaker_dAu/StRoot/weights/";
+    TString prefix = "TMVAClassification";
+    TString ptbin[3] = {"12", "23", "35"};
+
+    for (int pT = 0; pT < 3; pT++) {
+        reader[pT] = new TMVA::Reader( "!Color:!Silent" );
+        reader[pT]->AddVariable("k_dca", &k_dca[pT] );
+        reader[pT]->AddVariable("pi1_dca", &pi1_dca[pT] );
+        reader[pT]->AddVariable("dcaDaughters", &dcaDaughters[pT] );
+        reader[pT]->AddVariable("cosTheta", &cosTheta[pT]  );
+        reader[pT]->AddVariable("D_decayL", &D_decayL[pT] );
+        reader[pT]->AddVariable("dcaD0ToPv", &dcaD0ToPv[pT] );
+
+        TString methodName = "BDT method";
+        TString weightfile = dir + prefix + TString("_BDT.weights.pt") + ptbin[pT] + TString(".xml");
+        reader[pT]->BookMVA( methodName, weightfile );
+
+    }
+
 
     return kStOK;
 }
@@ -67,27 +89,7 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
      *
      *****/
 
-    TMVA::Tools::Instance();
 
-
-    TString dir    = "/star/u/zuzana/zuzana/D0v2/Dmaker_dAu/StRoot/weights/";
-    TString prefix = "TMVAClassification";
-    TString ptbin[3] = {"12", "23", "35"};
-
-    for (int pT = 0; pT < 3; pT++) {
-        reader[pT] = new TMVA::Reader( "!Color:!Silent" );
-        reader[pT]->AddVariable("k_dca", &k_dca[pT] );
-        reader[pT]->AddVariable("pi1_dca", &pi1_dca[pT] );
-        reader[pT]->AddVariable("dcaDaughters", &dcaDaughters[pT] );
-        reader[pT]->AddVariable("cosTheta", &cosTheta[pT]  );
-        reader[pT]->AddVariable("D_decayL", &D_decayL[pT] );
-        reader[pT]->AddVariable("dcaD0ToPv", &dcaD0ToPv[pT] );
-
-        TString methodName = "BDT method";
-        TString weightfile = dir + prefix + TString("_BDT.weights.pt") + ptbin[pT] + TString(".xml");
-        reader[pT]->BookMVA( methodName, weightfile );
-
-    }
 
 
 
