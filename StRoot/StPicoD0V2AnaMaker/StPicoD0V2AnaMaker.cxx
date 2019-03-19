@@ -11,6 +11,7 @@
 
 ClassImp(StPicoD0V2AnaMaker)
 
+float multBin[6] = {0,7,12,16,22,100};
 
 // _________________________________________________________
 StPicoD0V2AnaMaker::StPicoD0V2AnaMaker(char const* name, StPicoDstMaker* picoMaker, char const* outputBaseFileName) :
@@ -58,7 +59,7 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
 	std::vector<int> tracksofCand;
 
-
+    float momBins[4] = {1,2,3,5};
 
     /*****
      *
@@ -99,6 +100,20 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
         }
     }
 
+
+
+    //tmva input cuts
+    float const dcaV0ToPvCons = 0.05;
+    float const decayLengthCons = 0.0005; //0.0005
+    float const cosThetaCons = 0.5;
+    float const dcaDaughtersCons = 0.02;
+    float const kDca = 0.002;
+    float const pDca = 0.002;
+    float const minPt = 0.15;
+    //from Lukas's ana
+    float const bdtCuts[3] = {0.365, 0.299, 0.288};
+    float const meanFit[3] = {1.866, 1.863, 1.864};
+    float const sigmaFit[3] = {0.0137, 0.0131, 0.0234};
 
     /*****
     *
@@ -173,8 +188,10 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 // _________________________________________________________
 void StPicoD0V2AnaMaker::DeclareHistograms() {
     TString names[4] = {"cos_B", "cos_F", "sin_B", "sin_F"}; //backward and forward samples
+    float multBin[6] = {0, 7, 12, 16, 22, 100};
     int nMultBins = sizeof(multBin)/sizeof(multBin[0])-1;
 
+    float momBins[4] = {1,2,3,5};
     int nMomBins = sizeof(momBins)/sizeof(momBins[0])-1;
 
     for(int m = 0; m < 4; m++) {
@@ -454,6 +471,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
 
 //    float multBin[6] = {0,7,12,16,22,100};
     double etaGap[3] = {0,0.15,0.05};
+    float momBins[4] = {1,2,3,5};
 
     double maxNentries = weights->GetMaximum();
 
