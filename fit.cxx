@@ -59,10 +59,10 @@ void fit(){
 
 
 
-    TCanvas *c, *c2;
+    TCanvas *c, *c2, *c3;
 
 
-    TF1 *s, *s2, *b, *sb, *Nsig, *Nbkg, *spolu;
+    TF1 *dflow;
     double mean, sigma, norm, lin, cons;
 
     for(int pT = 0; pT < 3; pT++)
@@ -82,32 +82,27 @@ void fit(){
         norm = funUS->GetParameter(2);
         mean = funUS->GetParameter(3);
         sigma = funUS->GetParameter(4);
+
+        dflow = new TF1("spolu", "[0]*([1]*exp(-0.5*((x-[2])/[3])^2))/( [1]*exp(-0.5*((x-[2])/[3])^2) + [4] + [5]*x) + ([6]+[7]*x)*([4] + [5]*x)/( [1]*exp(-0.5*((x-[2])/[3])^2) + [4] + [5]*x)", fitRMin,fitRMax);
+        dflow->SetParameters(0.02, 1, 1, 1, 1, 1, 1, 1);
+        dflow->FixParameter(1, norm);
+        dflow->FixParameter(2, mean);
+        dflow->FixParameter(3, sigma);
+        dflow->FixParameter(4, cons);
+        dflow->FixParameter(5, lin);
+
+        c3 = new TCanvas;
+        diFlowMass[pT]->Fit(dflow, "R");
+        diFlowMass[pT]->Draw();
+        diFlowMass[pT]->SaveAs(Form("Figures/DifFlow_pT_%.0f_%0.f.png", momBins[pT], momBins[pT+1]));
         }
 
-    //s = new TF1("s", "31*exp(-0.5*((x-1.86)/0.023)^2)", fitRMin,fitRMax);
-    s = new TF1("s", "[0]*exp(-0.5*((x-[1])/[2])^2)", fitRMin,fitRMax);
-    //s->SetParameters(norm, mean, sigma);
-    s->FixParameter(0, norm);
-    s->FixParameter(1, mean);
-    s->FixParameter(2, sigma);
 
 
-    cout << " MEAN    " << mean << endl;
 
-    b = new TF1("b", "33 - 14*x", fitRMin,fitRMax);
 
-    sb = new TF1("sb", "s+b");
 
-    Nsig = new TF1("Nsig", "s/(s+b)");
 
-    Nbkg = new TF1("Nbkg", "b/(s+b)");
-
-    spolu = new TF1("spolu", "[0]*Nsig + ([1]+[2]*x)*Nbkg", fitRMin,fitRMax);
-    spolu->SetParameters(0.02, 1, 1);
-
-    new TCanvas;
-    diFlowMass[2]->Fit(spolu, "R");
-    diFlowMass[2]->Draw();
 
 
     /*
