@@ -30,12 +30,13 @@ int StPicoD0V2AnaMaker::InitHF() {
     DeclareHistograms();
     mOutFileBaseName = mOutFileBaseName.ReplaceAll(".root", "");
 
+    //weight file - reweighting phi
     TFile *fileW=new TFile("/star/u/zuzana/zuzana/D0v2/Dmaker_dAu/StRoot/StPicoD0V2AnaMaker/weight.root");
     if((!fileW) || (!fileW->IsOpen())) printf("file does not exist");
     weights = (TH1D *)fileW->Get("hadron_phi");
 
+    //TMVA
     TMVA::Tools::Instance();
-
 
     TString dir    = "/star/u/zuzana/zuzana/D0v2/Dmaker_dAu/StRoot/weights/";
     TString prefix = "TMVAClassification";
@@ -82,17 +83,6 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 	std::vector<int> tracksofCand;
 
     float momBins[4] = {1,2,3,5};
-
-    /*****
-     *
-     *  TMVA
-     *
-     *****/
-
-
-
-
-
     //tmva input cuts
     float const dcaV0ToPvCons = 0.05;
     float const decayLengthCons = 0.0005; //0.0005
@@ -105,12 +95,6 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
     float const bdtCuts[3] = {0.365, 0.299, 0.288};
     float const meanFit[3] = {1.866, 1.863, 1.864};
     float const sigmaFit[3] = {0.0137, 0.0131, 0.0234};
-
-    /*****
-    *
-    *  TMVA intro ends here!
-    *
-    *****/
 
     //loop - all particles
     for(unsigned int i=0;i<mPicoDst->numberOfTracks();i++)  {
