@@ -111,8 +111,15 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
             if(pair->pt() < 1 || pair->pt() > 5) continue;
             if(pair->eta() < -1 || pair->eta() > 1) continue;
 
-            int charge = 0;
-            if((kaon->charge() + pion1->charge() != 0) ) charge = 1;
+            //int charge = 0;
+            //if((kaon->charge() + pion1->charge() != 0) ) charge = 1;
+
+            float flag = -99.;
+            if(kaon->charge()<0 && pion1->charge()>0 ) flag=0.; // -+
+            if(kaon->charge()>0 && pion1->charge()<0 ) flag=1.; // +-
+
+            if(kaon->charge()<0 && pion1->charge()<0) flag=4.; // --
+            if(kaon->charge()>0 && pion1->charge()>0) flag=5.; // ++
 
             int pTbin = 0;
             for (int pT = 0; pT < 3; pT++) {
@@ -138,15 +145,15 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
                     float valueMVA = reader[pTbin]->EvaluateMVA("BDT method");
                     if(valueMVA < bdtCuts[pTbin]) continue;
 
-                    if(charge == 0) mass[pTbin]->Fill( pair->m() );
+                    if(flag < 2) mass[pTbin]->Fill( pair->m() );
                     else massBKG[pTbin]->Fill( pair->m() );
 
                     //v2
 
-                    if(pair->m() < meanFit[pTbin] - 3*sigmaFit[pTbin] || pair->m() > meanFit[pTbin] + 3*sigmaFit[pTbin]) continue;
+                    if(pair->m() < 1.2 || pair->m() > 2.4) continue;
                     if(pair->eta() < 0.075 && pair->eta() > -0.075) continue; //eta gap
 
-                    getCorV2(pair, 1, charge);
+                    getCorV2(pair, 1, flag);
 
                 }
                 }
@@ -225,8 +232,8 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
         massBKG[pT] = new TH1D(Form("Mass_BKG_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "Mass of K pi pair - LS", 2000, 0.4, 2.4);
         massBKG[pT]->Sumw2();
 
-        diFlowMass[pT] = new TProfile(Form("diFlowMass_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "d2 D0 vs. m_inv; m_inv; d_2", 200, 1.75, 1.95);
-        diFlowMassBKG[pT] = new TProfile(Form("diFlowMassBKG_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "d2 D0 vs. m_inv - wrong sign; m_inv; d_2", 200, 1.75, 1.95);
+        diFlowMass[pT] = new TProfile(Form("diFlowMass_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "d2 D0 vs. m_inv; m_inv; d_2", 2000, 0.4, 2.4);
+        diFlowMassBKG[pT] = new TProfile(Form("diFlowMassBKG_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "d2 D0 vs. m_inv - wrong sign; m_inv; d_2", 2000, 0.4, 2.4);
     }
 
     NtracksFvsCum = new TProfile("NtracksFvsCum", "NtracksFvsCum", 100, 0, 100);
@@ -441,7 +448,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 }
 
 // _________________________________________________________
-bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
+bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
     int mult = mPicoEvent->grefMult();
 
 //    float multBin[6] = {0,7,12,16,22,100};
@@ -458,7 +465,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
     int k=0;
     double corFill[7] = {0};
     corFill[0] = 1 ;
-    if(charge == 0) {
+    if(flag < 2) {
         corFill[1] = weightDcan*sin(2 * kp->phi());
         corFill[2] = weightDcan*cos(2 * kp->phi());
 
@@ -467,7 +474,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
         D_phi->Fill(kp->phi());
         if (kp->eta() > 0) D_phi_etaP->Fill(kp->phi());
         if (kp->eta() < 0) D_phi_etaN->Fill(kp->phi());
-        phiVsEtaDcand->Fill(kp->phi(), kp->phi());
+        phiVsEtaDcand->Fill(kp->phi(), kp->eta());
 
         for (unsigned int i = 0; i < mPicoDst->numberOfTracks(); i++) {
             StPicoTrack const *hadron = mPicoDst->track(i);
@@ -498,7 +505,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
             for (int pT = 0; pT < 3; pT++) {
                 if(kp->pt() >= momBins[pT] && kp->pt() < momBins[pT+1])
                 {
-                    mass[pT]->Fill( kp->m() );
+                    //mass[pT]->Fill( kp->m() );
                     diFlowMass[pT]->Fill(kp->m(), dif22/(weightDcan*corFill[3]), weight);
                 }
             }
@@ -541,7 +548,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int charge) {
             for (int pT = 0; pT < 3; pT++) {
                 if(kp->pt() >= momBins[pT] && kp->pt() < momBins[pT+1])
                 {
-                    massBKG[pT]->Fill( kp->m() );
+                    //massBKG[pT]->Fill( kp->m() );
                     diFlowMassBKG[pT]->Fill(kp->m(), dif22/(weightDcan*corFill[3]), weight);
                 }
             }
