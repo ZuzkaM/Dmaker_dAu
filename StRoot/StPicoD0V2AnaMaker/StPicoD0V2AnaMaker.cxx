@@ -455,6 +455,9 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
     double etaGap[3] = {0,0.15,0.05};
     float momBins[4] = {1,2,3,5};
 
+    float const meanFit[3] = {1.866, 1.863, 1.864};
+    float const sigmaFit[3] = {0.0137, 0.0131, 0.0234};
+
     double maxNentries = weights->GetMaximum();
 
     double weightDcan = maxNentries/(weights->GetBinContent( weights->FindBin( kp->phi() ) ));
@@ -507,11 +510,11 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
                 {
                     //mass[pT]->Fill( kp->m() );
                     diFlowMass[pT]->Fill(kp->m(), dif22/(weightDcan*corFill[3]), weight);
+                    if(kp->m() > meanFit[pT] - 3*sigmaFit[pT] && kp->m() < meanFit[pT] + 3*sigmaFit[pT]) dirFlow2->Fill(kp->pt(), dif22/(weightDcan*corFill[3]), weight);
                 }
             }
             corrD2[0]->Fill(kp->pt(), corFill[2], weight);
             corrD2[1]->Fill(kp->pt(), corFill[1], weight);
-            dirFlow2->Fill(kp->pt(), dif22/(weightDcan*corFill[3]), weight);
 
 
         }
@@ -550,11 +553,11 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
                 {
                     //massBKG[pT]->Fill( kp->m() );
                     diFlowMassBKG[pT]->Fill(kp->m(), dif22/(weightDcan*corFill[3]), weight);
+                    if(kp->m() > meanFit[pT] - 3*sigmaFit[pT] && kp->m() < meanFit[pT] + 3*sigmaFit[pT]) dirFlow2BKG->Fill(kp->pt(), dif22/(weightDcan*corFill[3]), weight);
                 }
             }
             corrD2BKG[0]->Fill(kp->pt(), corFill[2], weight);
             corrD2BKG[1]->Fill(kp->pt(), corFill[1], weight);
-            dirFlow2BKG->Fill(kp->pt(), dif22/(weightDcan*corFill[3]), weight);
 
     }
 
