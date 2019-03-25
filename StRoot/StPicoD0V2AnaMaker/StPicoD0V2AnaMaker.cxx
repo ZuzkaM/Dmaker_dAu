@@ -433,8 +433,8 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         sinH->Fill(mult, Qvec[2]/Qvec[0]);
 
         //Ntracks vs cumulant
-        NtracksBvsCum->Fill(NtracksB, c22/(hadronFill_noC[0]*hadronFill_noC[3]));
-        NtracksFvsCum->Fill(NtracksF, c22/(hadronFill_noC[0]*hadronFill_noC[3]));
+        NtracksBvsCum->Fill(NtracksB, c22/(hadronFill[0]*hadronFill[3]));
+        NtracksFvsCum->Fill(NtracksF, c22/(hadronFill[0]*hadronFill[3]));
 
         NtracksBvsF->Fill(NtracksB, NtracksF);
 
