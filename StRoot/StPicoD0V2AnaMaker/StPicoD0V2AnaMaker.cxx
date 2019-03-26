@@ -154,12 +154,13 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
                     if(pair->eta() < 0.075 && pair->eta() > -0.075) continue; //eta gap
 
                     getCorV2(pair, 1, flag);
-
+                    if(pair->m() < meanFit[pTbin] - 3*sigmaFit[pTbin] || pair->m() < meanFit[pTbin] + 3*sigmaFit[pTbin]) continue;
+                    tracksofCand.push_back(pion1->id());
+                    tracksofCand.push_back(kaon->id());
+                    }
                 }
-                }
 
-        	tracksofCand.push_back(pion1->id());
-			tracksofCand.push_back(kaon->id());
+
 
         }  // for (unsigned short idxKaon = 0; idxKaon < mIdxPicoKaons.size(); ++idxKaon)
     } // for (unsigned short idxPion1 = 0; idxPion1 < mIdxPicoPions.size(); ++idxPion1)
