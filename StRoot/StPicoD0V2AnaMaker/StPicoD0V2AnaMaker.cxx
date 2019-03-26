@@ -355,9 +355,9 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 
         weightHadron = maxNentries/(weights->GetBinContent( weights->FindBin(phiHadron) ));
 
-        Qvec[0]++;
-        Qvec[1] += cos(2 * phiHadron);
-        Qvec[2] += sin(2 * phiHadron);
+        Qvec[0] += weightHadron;
+        Qvec[1] += weightHadron*cos(2 * phiHadron);
+        Qvec[2] += weightHadron*sin(2 * phiHadron);
 
         if(etaHadron<-0.5*mEtaGap) {//backward sample
             hadronFill[0] += weightHadron;
