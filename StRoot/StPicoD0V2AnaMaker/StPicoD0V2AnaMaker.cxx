@@ -41,9 +41,9 @@ int StPicoD0V2AnaMaker::InitHF() {
     TString dir    = "/star/u/zuzana/zuzana/D0v2/Dmaker_dAu/StRoot/weights/";
     TString prefix = "TMVAClassification";
     //TString ptbin[3] = {"12", "23", "35"};
-    TString ptbin[2] = {"12", "25"};
+    TString ptbin[1] = {"15"};
 
-    for (int pT = 0; pT < 2; pT++) {
+    for (int pT = 0; pT < 1; pT++) {
         reader[pT] = new TMVA::Reader( "!Color:!Silent" );
         reader[pT]->AddVariable("k_dca", &k_dca[pT] );
         reader[pT]->AddVariable("pi1_dca", &pi1_dca[pT] );
@@ -83,7 +83,7 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
 	std::vector<int> tracksofCand;
 
-    float momBins[3] = {1,2,5};
+    float momBins[2] = {1,5};
     //float momBins[4] = {1,2,3,5};
     //tmva input cuts
     float const dcaV0ToPvCons = 0.05;
@@ -99,9 +99,9 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
     float const meanFit[3] = {1.866, 1.863, 1.864};
     float const sigmaFit[3] = {0.0137, 0.0131, 0.0234};
 */
-    float const bdtCuts[2] = {0.365, 0.211};
-    float const meanFit[2] = {1.866, 1.863};
-    float const sigmaFit[2] = {0.0137, 0.0154};
+    float const bdtCuts[1] = {0.279};
+    float const meanFit[1] = {1.864};
+    float const sigmaFit[1] = {0.0131};
 
     //loop - all particles
     for(unsigned int i=0;i<mPicoDst->numberOfTracks();i++)  {
@@ -129,7 +129,7 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
             if(kaon->charge()>0 && pion1->charge()>0) flag=5.; // ++
 
             int pTbin = 0;
-            for (int pT = 0; pT < 2; pT++) {
+            for (int pT = 0; pT < 1; pT++) {
                 if(pair->pt() >= momBins[pT] && pair->pt() < momBins[pT+1]) pTbin = pT;
             }
 
@@ -181,7 +181,7 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     float multBin[6] = {0, 7, 12, 16, 22, 100};
     int nMultBins = sizeof(multBin)/sizeof(multBin[0])-1;
 
-    float momBins[3] = {1,2,5};
+    float momBins[2] = {1,5};
     int nMomBins = sizeof(momBins)/sizeof(momBins[0])-1;
 
     for(int m = 0; m < 4; m++) {
@@ -234,7 +234,7 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
 
 
 
-    for(int pT = 0; pT < 2; pT++){
+    for(int pT = 0; pT < 1; pT++){
         mass[pT] = new TH1D(Form("Mass_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "Mass of K pi pair - US", 2000, 0.4, 2.4);
         mass[pT]->Sumw2();
         massBKG[pT] = new TH1D(Form("Mass_BKG_pT_%.0f_%0.f", momBins[pT], momBins[pT+1]), "Mass of K pi pair - LS", 2000, 0.4, 2.4);
@@ -297,7 +297,7 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 
 
 
-    for(int pT = 0; pT < 2; pT++){
+    for(int pT = 0; pT < 1; pT++){
         mass[pT]->Write();
         massBKG[pT]->Write();
         diFlowMass[pT]->Write();
@@ -461,10 +461,10 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
 
 //    float multBin[6] = {0,7,12,16,22,100};
     double etaGap[3] = {0,0.15,0.05};
-    float momBins[3] = {1,2,5};
+    float momBins[2] = {1,5};
 
-    float const meanFit[2] = {1.866, 1.863};
-    float const sigmaFit[2] = {0.0137, 0.0154};
+    float const meanFit[1] = {1.864};
+    float const sigmaFit[1] = {0.0131};
 
     double maxNentries = weights->GetMaximum();
 
@@ -513,7 +513,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
                     dirFlow[m]->Fill(kp->pt(), dif22/(weightDcan*corFill[3]), weight);
                 }
             }
-            for (int pT = 0; pT < 2; pT++) {
+            for (int pT = 0; pT < 1; pT++) {
                 if(kp->pt() >= momBins[pT] && kp->pt() < momBins[pT+1])
                 {
                     //mass[pT]->Fill( kp->m() );
@@ -556,7 +556,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
 
                 }
             }
-            for (int pT = 0; pT < 2; pT++) {
+            for (int pT = 0; pT < 1; pT++) {
                 if(kp->pt() >= momBins[pT] && kp->pt() < momBins[pT+1])
                 {
                     //massBKG[pT]->Fill( kp->m() );
