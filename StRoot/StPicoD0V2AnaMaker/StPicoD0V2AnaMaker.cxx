@@ -96,7 +96,8 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
     float const pDca = 0.002;
     float const minPt = 0.15;
     //from Lukas's ana
-    float const bdtCuts[nptBins] = {0.365, 0.299, 0.288};
+    //float const bdtCuts[nptBins] = {0.365, 0.299, 0.288};
+    float const bdtCuts[nptBins] = {0.21, 0.2, 0.22}; //looser cuts
     float const meanFit[nptBins] = {1.866, 1.863, 1.864};
     float const sigmaFit[nptBins] = {0.0137, 0.0131, 0.0234};
 
