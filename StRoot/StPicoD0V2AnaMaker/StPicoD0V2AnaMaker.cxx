@@ -483,6 +483,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
 
     int k=0;
     double corFill[7] = {0};
+    double ntracks = 0;
     corFill[0] = 1 ;
     if(flag < 2) {
         corFill[1] = weightDcan*sin(2 * kp->phi());
@@ -510,7 +511,9 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
             corFill[3] += weightHadron;
             corFill[4] += weightHadron * sin(2 * phiHadron);
             corFill[5] += weightHadron * cos(2 * phiHadron);
+            ntracks++;
         }
+        if(ntracks < 10) return false;
         QvecHadrons = TComplex(corFill[5], corFill[4]);
         double dif22 = (QvecD*(TComplex::Conjugate(QvecHadrons))).Re();
 
@@ -524,7 +527,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
             for (int pT = 0; pT < nptBins; pT++) {
                 if(kp->pt() >= momBins[pT] && kp->pt() < momBins[pT+1])
                 {
-                    //mass[pT]->Fill( kp->m() );
+                    if(weightDcan == 0 || corFill[3] == 0) return false;
                     diFlowMass[pT]->Fill(kp->m(), dif22/(weightDcan*corFill[3]), weight);
                     if(kp->m() > meanFit[pT] - 3*sigmaFit[pT] && kp->m() < meanFit[pT] + 3*sigmaFit[pT]) dirFlow2->Fill(kp->pt(), dif22/(weightDcan*corFill[3]), weight);
                 }
@@ -551,14 +554,15 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
             corFill[3] += weightHadron;
             corFill[4] += weightHadron * sin(2 * phiHadron);
             corFill[5] += weightHadron * cos(2 * phiHadron);
+            ntracks++;
             }
-
+            if(ntracks < 10) return false;
             QvecHadrons = TComplex(corFill[5], corFill[4]);
             double dif22 = (QvecD*(TComplex::Conjugate(QvecHadrons))).Re();
 
             for (int m = 0; m < 5; m++) {
                 if (mult >= multBin[m] && mult < multBin[m + 1]) {
-                    corrDBKG[0][m]->Fill(kp->pt(), corFill[2], weight);
+                    corrDBKG[0][m]->Fill(kp->pt(), corFill[2], weight);3r
                     corrDBKG[1][m]->Fill(kp->pt(), corFill[1], weight);
                     dirFlowBKG[m]->Fill(kp->pt(), dif22/(weightDcan*corFill[3]), weight);
 
