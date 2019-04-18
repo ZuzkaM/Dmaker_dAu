@@ -432,7 +432,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 
     //Z code: reference flow creation: average sin/cos phi of a hadron in an event.... (no error!)
 
-    if(idxGap==1)  {
+    if(true)  {
         qVec[0]->Fill(mult, hadronFill[2]/hadronFill[0], reweight);
         qVec[1]->Fill(mult, hadronFill[5]/hadronFill[3], reweight);
         qVec[2]->Fill(mult, hadronFill[1]/hadronFill[0], reweight);
