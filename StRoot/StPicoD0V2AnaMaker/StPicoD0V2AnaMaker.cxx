@@ -251,7 +251,7 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     NtracksBvsCum = new TProfile("NtracksBvsCum", "NtracksBvsCum", 100, 0, 100);
 
     NtracksBvsF = new TH2D("NtracksBvsF", "", 100, 0, 100, 100, 0, 100);
-    NtracksVsMult = new TH2D("NtracksVsMult", "", 100, 0, 100, 100, 0, 100);
+    NtracksVsMult = new TH2D("NtracksVsMult", "", 100, 0, 1000, 100, 0, 1000);
 
     phiVsEta = new TH2D("phiVsEta", "phi vs. eta of charged hadrons", 1000, -5, 5,40, -2, 2);
     phiVsEtaDcand = new TH2D("phiVsEtaDcand", "phi vs. eta of D candidates", 1000, -5, 5,40, -2, 2);
