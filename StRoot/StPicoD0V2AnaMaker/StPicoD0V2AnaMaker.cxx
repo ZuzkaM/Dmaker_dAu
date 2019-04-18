@@ -75,7 +75,7 @@ int StPicoD0V2AnaMaker::FinishHF() {
 }
 // _________________________________________________________
 int StPicoD0V2AnaMaker::MakeHF() {
-    getHadronCorV2(1);
+    getHadronCorV2(2);
     return kStOK;
 }
 
@@ -251,6 +251,7 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     NtracksBvsCum = new TProfile("NtracksBvsCum", "NtracksBvsCum", 100, 0, 100);
 
     NtracksBvsF = new TH2D("NtracksBvsF", "", 100, 0, 100, 100, 0, 100);
+    NtracksVsMult = new TH2D("NtracksVsMult", "", 100, 0, 100, 100, 0, 100);
 
     phiVsEta = new TH2D("phiVsEta", "phi vs. eta of charged hadrons", 1000, -5, 5,40, -2, 2);
     phiVsEtaDcand = new TH2D("phiVsEtaDcand", "phi vs. eta of D candidates", 1000, -5, 5,40, -2, 2);
@@ -314,6 +315,7 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
     NtracksFvsCum->Write();
 
     NtracksBvsF->Write();
+    NtracksVsMult->Write();
 
     phiVsEta->Write();
     phiVsEtaDcand->Write();
@@ -343,7 +345,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
     TComplex QvectorF_noC;
     TComplex QvectorB_noC;
 
-	double etaGap[3] = {0,0.15,0.05};
+	double etaGap[3] = {0,0.15,1.0};
     double mEtaGap = etaGap[idxGap];
     float hadronFill[7] = {0};
     float hadronFill_noC[7] = {0};
@@ -351,14 +353,17 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
     const double reweight = 1;//mGRefMultCorrUtil->getWeight();
     // int centrality  = mGRefMultCorrUtil->getCentralityBin9();
     int mult = mPicoEvent->grefMult();
+    int Ntracks = 0;
 
 
     //loop over all tracks
     for(unsigned int i=0;i<mPicoDst->numberOfTracks();++i) {
         StPicoTrack const* hadron = mPicoDst->track(i);
+        Ntracks++;
     
         if(!mHFCuts->isGoodTrack(hadron)) continue;
         if(!mHFCuts->isGoodProton(hadron) && !mHFCuts->isGoodKaon(hadron) && !mHFCuts->isGoodPion(hadron)) continue;
+        if(hadron->gMom().Perp() > 3.0) continue; //cut to make ref flow similar to ALICE .... thesis purpose
         float etaHadron = hadron->gMom().PseudoRapidity();
         float phiHadron = hadron->gMom().Phi();
 
@@ -451,6 +456,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         NtracksFvsCum->Fill(NtracksF, c22/(hadronFill[0]*hadronFill[3]));
 
         NtracksBvsF->Fill(NtracksB, NtracksF);
+        NtracksVsMult->Fill(Ntracks, mult);
 
         //no weights
         c22 = (QvectorB_noC*(TComplex::Conjugate(QvectorF_noC))).Re();
@@ -468,7 +474,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
     const int nptBins = 3;
 
 //    float multBin[6] = {0,7,12,16,22,100};
-    double etaGap[3] = {0,0.15,0.05};
+    double etaGap[3] = {0,0.15,1.0};
     float momBins[nptBins+1] = {1,2,3,5};
 
     float const meanFit[nptBins] = {1.866, 1.863, 1.864};

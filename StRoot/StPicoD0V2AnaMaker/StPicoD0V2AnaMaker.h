@@ -116,6 +116,7 @@ private:
     TProfile *NtracksFvsCum;
     TProfile *NtracksBvsCum;
     TH2D *NtracksBvsF;
+    TH2D *NtracksVsMult;
 
     TH2D *phiVsEta;
     TH2D *phiVsEtaDcand;
