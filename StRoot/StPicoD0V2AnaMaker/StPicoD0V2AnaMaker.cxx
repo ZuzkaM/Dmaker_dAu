@@ -256,6 +256,12 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     phiVsEta = new TH2D("phiVsEta", "phi vs. eta of charged hadrons", 1000, -5, 5,40, -2, 2);
     phiVsEtaDcand = new TH2D("phiVsEtaDcand", "phi vs. eta of D candidates", 1000, -5, 5,40, -2, 2);
 
+    TOF = new TH2D("TOF", "", 1000, 0, 3.5, 1000, 0, 1.5);
+    TPC = new TH2D("TPC", "", 1000, 0, 3.5, 1000, 0, 6);
+
+    kPT = new TH1D("kPT", "", 1000, 0, 10);
+    piPT = new TH1D("piPT", "", 100, 0, 10);
+
 }
 
 // _________________________________________________________
@@ -320,6 +326,11 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
     phiVsEta->Write();
     phiVsEtaDcand->Write();
 
+    TOF->Write();
+    TPC->Write();
+    kPT->Write();
+    piPT->Write();
+
 }
 
 // _________________________________________________________
@@ -362,15 +373,19 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 
     
         if(!mHFCuts->isGoodTrack(hadron)) continue;
+        TOF->Fill(hadron->gMom().Perp(), hadron->dEdx());
         if(!mHFCuts->isGoodProton(hadron) && !mHFCuts->isGoodKaon(hadron) && !mHFCuts->isGoodPion(hadron)) continue;
         Ntracks++;
-        if(hadron->gMom().Perp() > 3.0) continue; //cut to make ref flow similar to ALICE .... thesis purpose
+        //if(hadron->gMom().Perp() > 3.0) continue; //cut to make ref flow similar to ALICE .... thesis purpose
         float etaHadron = hadron->gMom().PseudoRapidity();
         float phiHadron = hadron->gMom().Phi();
 
         if(etaHadron < -1 || etaHadron > 1) continue;
 
         if(containsId(hadron->id(), tracksToRemove)) continue;
+
+        if(mHFCuts->isGoodKaon(hadron)) kPT->Fill(hadron->gMom().Perp());
+        if(mHFCuts->isGoodPion(hadron)) piPT->Fill(hadron->gMom().Perp());
 
         weightHadron = maxNentries/(weights->GetBinContent( weights->FindBin(phiHadron) ));
 
