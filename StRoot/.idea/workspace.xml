@@ -10,9 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0a3eb74a-3a37-44c1-b4da-771c0444c00c" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/StPicoD0V2AnaMaker/StPicoD0V2AnaMaker.cxx" beforeDir="false" afterPath="$PROJECT_DIR$/StPicoD0V2AnaMaker/StPicoD0V2AnaMaker.cxx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/StPicoD0V2AnaMaker/StPicoD0V2AnaMaker.h" beforeDir="false" afterPath="$PROJECT_DIR$/StPicoD0V2AnaMaker/StPicoD0V2AnaMaker.h" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -29,8 +27,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/StPicoMixedEventMaker/StPicoEventMixer.cxx">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="422">
-              <caret line="160" column="1" lean-forward="true" selection-start-line="160" selection-start-column="1" selection-end-line="160" selection-end-column="1" />
+            <state relative-caret-position="456">
+              <caret line="92" lean-forward="true" selection-start-line="92" selection-end-line="92" />
             </state>
           </provider>
         </entry>
@@ -38,8 +36,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/StPicoCutsBase/StPicoCutsBase.cxx">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-6520">
-              <caret line="66" column="65" lean-forward="true" selection-start-line="66" selection-start-column="65" selection-end-line="66" selection-end-column="65" />
+            <state relative-caret-position="290">
+              <caret line="227" column="18" selection-start-line="227" selection-start-column="9" selection-end-line="227" selection-end-column="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/StPicoCutsBase/StPicoCutsBase.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="798">
+              <caret line="150" column="3" selection-start-line="150" selection-start-column="3" selection-end-line="150" selection-end-column="3" />
             </state>
           </provider>
         </entry>
@@ -56,8 +63,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/StPicoD0V2AnaMaker/StPicoD0V2AnaMaker.cxx">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="494">
-              <caret line="386" column="49" lean-forward="true" selection-start-line="386" selection-start-column="49" selection-end-line="386" selection-end-column="49" />
+            <state relative-caret-position="509">
+              <caret line="375" column="30" lean-forward="true" selection-start-line="375" selection-start-column="30" selection-end-line="375" selection-end-column="30" />
             </state>
           </provider>
         </entry>
@@ -73,6 +80,9 @@
       <find>isTOFmatched</find>
       <find>isHybridTOFHadron</find>
       <find>isTPC</find>
+      <find>isTPCKaon</find>
+      <find>dedx</find>
+      <find>dEdx</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -81,6 +91,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/StPicoCutsBase/StPicoCutsBase.cxx" />
+        <option value="$PROJECT_DIR$/StPicoCutsBase/StPicoCutsBase.h" />
         <option value="$PROJECT_DIR$/StPicoD0V2AnaMaker/StPicoD0V2AnaMaker.cxx" />
       </list>
     </option>
@@ -130,12 +142,12 @@
       <workItem from="1507648928403" duration="37000" />
       <workItem from="1555624341485" duration="1317000" />
       <workItem from="1555851970140" duration="1201000" />
-      <workItem from="1556364802762" duration="2840000" />
+      <workItem from="1556364802762" duration="3925000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5395000" />
+    <option name="totallyTimeSpent" value="6480000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1987" y="-2" width="1853" height="1082" extended-state="6" />
@@ -174,24 +186,45 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/StPicoCutsBase/StPicoCutsBase.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="798">
+          <caret line="150" column="3" selection-start-line="150" selection-start-column="3" selection-end-line="150" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/StPicoCutsBase/StPicoCutsBase.cxx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-6520">
-          <caret line="66" column="65" lean-forward="true" selection-start-line="66" selection-start-column="65" selection-end-line="66" selection-end-column="65" />
+        <state relative-caret-position="290">
+          <caret line="227" column="18" selection-start-line="227" selection-start-column="9" selection-end-line="227" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/StPicoQAMaker/StPicoQAMaker.cxx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="290">
+          <caret line="127" column="42" selection-start-line="127" selection-start-column="38" selection-end-line="127" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/StPicoD0AnaMaker/StPicoD0AnaMaker.cxx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="595">
+          <caret line="126" column="38" lean-forward="true" selection-start-line="126" selection-start-column="38" selection-end-line="126" selection-end-column="38" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/StPicoMixedEventMaker/StPicoEventMixer.cxx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="422">
-          <caret line="160" column="1" lean-forward="true" selection-start-line="160" selection-start-column="1" selection-end-line="160" selection-end-column="1" />
+        <state relative-caret-position="456">
+          <caret line="92" lean-forward="true" selection-start-line="92" selection-end-line="92" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/StPicoD0V2AnaMaker/StPicoD0V2AnaMaker.cxx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="494">
-          <caret line="386" column="49" lean-forward="true" selection-start-line="386" selection-start-column="49" selection-end-line="386" selection-end-column="49" />
+        <state relative-caret-position="509">
+          <caret line="375" column="30" lean-forward="true" selection-start-line="375" selection-start-column="30" selection-end-line="375" selection-end-column="30" />
         </state>
       </provider>
     </entry>
