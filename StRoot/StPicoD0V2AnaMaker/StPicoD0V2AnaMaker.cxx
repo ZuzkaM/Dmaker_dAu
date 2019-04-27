@@ -256,7 +256,7 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     phiVsEta = new TH2D("phiVsEta", "phi vs. eta of charged hadrons", 1000, -5, 5,40, -2, 2);
     phiVsEtaDcand = new TH2D("phiVsEtaDcand", "phi vs. eta of D candidates", 1000, -5, 5,40, -2, 2);
 
-    TOF = new TH2D("TOF", "", 1000, 0, 3.5, 1000, 0, 1.5);
+    TOF = new TH2D("TOF", "", 1000, 0, 3.5, 1000, 0, 2.5);
     TPC = new TH2D("TPC", "", 1000, 0, 3.5, 1000, 0, 6);
 
     kPT = new TH1D("kPT", "", 1000, 0, 10);
@@ -374,7 +374,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
     
         if(!mHFCuts->isGoodTrack(hadron)) continue;
         //PID capability plots
-        TOF->Fill(hadron->gMom().Perp(), hadron->dEdx());
+        TOF->Fill(hadron->gMom().Perp(), hadron->dedx());
 
         float beta = mHFCuts->getTofBetaBase(hadron);
         if(beta > 0) TOF->Fill(hadron->gMom().Perp(), 1/beta);
