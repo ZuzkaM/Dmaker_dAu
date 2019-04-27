@@ -374,7 +374,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
     
         if(!mHFCuts->isGoodTrack(hadron)) continue;
         //PID capability plots
-        TOF->Fill(hadron->gMom().Perp(), hadron->dedx());
+        TPC->Fill(hadron->gMom().Perp(), hadron->dEdx());
 
         float beta = mHFCuts->getTofBetaBase(hadron);
         if(beta > 0) TOF->Fill(hadron->gMom().Perp(), 1/beta);
