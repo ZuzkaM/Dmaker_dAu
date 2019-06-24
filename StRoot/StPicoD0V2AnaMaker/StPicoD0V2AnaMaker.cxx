@@ -419,8 +419,8 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         return false;
 
     double c22 = (QvectorB[2][1]*(TComplex::Conjugate(QvectorF[2][1]))).Re();
-    refFlow->Fill(mult, (c22/(QvectorB[0][1]*QvectorF[0][1])), reweight);
-    refFlow2->Fill(mult, (c22/(QvectorB[0][1]*QvectorF[0][1])), reweight);
+    refFlow->Fill(mult, (c22/(QvectorB[0][1]*QvectorF[0][1])));
+    refFlow2->Fill(mult, (c22/(QvectorB[0][1]*QvectorF[0][1])));
 
     //Ntracks vs cumulant
     NtracksBvsCum->Fill(NtracksB, c22/(QvectorB[0][1]*QvectorF[0][1]));
@@ -428,8 +428,6 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 
     NtracksBvsF->Fill(NtracksB, NtracksF);
     NtracksVsMult->Fill(Ntracks, mult);
-
-    }
 
     return true;
 }
