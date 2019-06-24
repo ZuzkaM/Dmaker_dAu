@@ -91,7 +91,6 @@ private:
 
     TProfile *qVec[4];
     TProfile *refFlow;
-    TProfile *refFlow_noC;
     TProfile *dirFlow[5];
     TProfile *corrD[2][5];
     TProfile *dirFlowBKG[5];
