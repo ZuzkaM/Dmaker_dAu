@@ -116,9 +116,11 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
 
             StHFPair *pair = new StHFPair(pion1, kaon, mHFCuts->getHypotheticalMass(StPicoCutsBase::kPion),mHFCuts->getHypotheticalMass(StPicoCutsBase::kKaon), i, j, mPrimVtx, mBField, kTRUE); //the order (pion1, kaon) needs to stay same!
 
+	    //analysis just in this interval
             if(pair->pt() < 1 || pair->pt() > 5) continue;
             if(pair->eta() < -1 || pair->eta() > 1) continue;
 
+	    //unlike sign pairs < 2
             float flag = -99.;
             if(kaon->charge()<0 && pion1->charge()>0 ) flag=0.; // -+
             if(kaon->charge()>0 && pion1->charge()<0 ) flag=1.; // +-
@@ -126,11 +128,11 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
             if(kaon->charge()<0 && pion1->charge()<0) flag=4.; // --
             if(kaon->charge()>0 && pion1->charge()>0) flag=5.; // ++
 
+	    //find the correct pT bin
             int pTbin = 0;
             for (int pT = 0; pT < nptBins; pT++) {
                 if(pair->pt() >= momBins[pT] && pair->pt() < momBins[pT+1]) pTbin = pT;
             }
-
 
             //assigning TMVA variables to those used in picos
             k_pt[pTbin] = kaon->gPt();
@@ -142,20 +144,20 @@ std::vector<int> StPicoD0V2AnaMaker::createCandidates() {
             dcaD0ToPv[pTbin] = pair->DcaToPrimaryVertex();
             dcaDaughters[pTbin] = pair->dcaDaughters();
 
+	    //tmva input cuts - similar as during the training phase
             if  (k_pt[pTbin]>minPt && pi1_pt[pTbin]>minPt && D_decayL[pTbin]>decayLengthCons && D_decayL[pTbin]<0.2 &&
                  dcaDaughters[pTbin]<dcaDaughtersCons && k_dca[pTbin]>kDca && k_dca[pTbin]<0.2 &&
                  pi1_dca[pTbin]>pDca && pi1_dca[pTbin]<0.2 && dcaD0ToPv[pTbin] < dcaV0ToPvCons && cosTheta[pTbin] > cosThetaCons) {
 
-                 //evaluation BDTs
+                 //evaluate BDT, continue just pairs that have passed BDT cut
                  float valueMVA = reader[pTbin]->EvaluateMVA("BDT method");
                  if(valueMVA < bdtCuts[pTbin]) continue;
 
-                 //signal vs. background discrimination
+                 //filling plots of invariant mass for unlike and like sign pairs
                  if(flag < 2) mass[pTbin]->Fill( pair->m() );
                  else massBKG[pTbin]->Fill( pair->m() );
 
-                 //v2
-
+                 //v2 analysis
                  if(pair->m() < 1.2 || pair->m() > 2.4) continue; //cut for d22 vs. mInv
                  if(pair->eta() < 0.075 && pair->eta() > -0.075) continue; //eta gap
 
