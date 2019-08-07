@@ -11,12 +11,15 @@
 
 ClassImp(StPicoD0V2AnaMaker)
 
+const double etaGap[3] = {0,0.15,1.0};
 const float multBin[6] = {0,7,12,16,22,100};
+//set number of pT bins and binning
 const int nptBins = 3;
 const float momBins[nptBins+1] = {1,2,3,5};
-const double etaGap[3] = {0,0.15,1.0};
+//set means and sigmas from fit of the invariant mass -- !! must be in accordance with previous lines!! #of bins
 float const meanFit[nptBins] = {1.866, 1.863, 1.864};
 float const sigmaFit[nptBins] = {0.0137, 0.0131, 0.0234};
+// SET harmonics (developed for elliptic flow v_2, therefore harmonics = 2)
 const int harmonics = 2;
 
 
