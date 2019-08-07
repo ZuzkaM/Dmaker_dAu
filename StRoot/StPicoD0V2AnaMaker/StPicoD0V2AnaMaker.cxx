@@ -339,7 +339,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         if(mHFCuts->isGoodKaon(hadron)) kPT->Fill(hadron->gMom().Perp());
         if(mHFCuts->isGoodPion(hadron)) piPT->Fill(hadron->gMom().Perp());
 
-        //REWEIGHTING -- applying phi plots
+        //REWEIGHTING -- applying phi weights
         weightHadron = maxNentries/(weights->GetBinContent( weights->FindBin(phiHadron) ));
 
         //GENERIC FRAMEWORK
