@@ -452,7 +452,7 @@ bool StPicoD0V2AnaMaker::getCorV2(StHFPair *kp,double weight, int flag) {
             QvecHadrons[harm][ipow] = TComplex(QcosH[harm][ipow], QsinH[harm][ipow]);
         }
     }
-
+    //differential flow d_2{2} calculation
     double dif22 = ((QvecD[2][1]*(TComplex::Conjugate(QvecHadrons[2][1])))/(QvecD[0][1]*QvecHadrons[0][1]) ).Re();
 
     //US pairs
