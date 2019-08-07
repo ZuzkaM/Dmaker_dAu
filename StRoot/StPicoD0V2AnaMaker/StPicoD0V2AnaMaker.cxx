@@ -489,6 +489,7 @@ bool StPicoD0V2AnaMaker::isEtaGap(double dEta,double mGap,double hEta) {
         return false;
 }
 
+//excluding daughter particles
 bool StPicoD0V2AnaMaker::containsId(int id, std::vector<int>& tracksToRemove)
 {
 	for(unsigned int i = 0; i < tracksToRemove.size(); i++)
