@@ -89,9 +89,7 @@ private:
     TProfile *V2Mass[2][6][5];
     TProfile *candPt;
 
-    TProfile *qVec[4];
     TProfile *refFlow;
-    TProfile *qVec2[4];
     TProfile *refFlow2;
     TProfile *dirFlow2;
     TProfile *dirFlow2BKG;
