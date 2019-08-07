@@ -180,14 +180,6 @@ void StPicoD0V2AnaMaker::DeclareHistograms() {
     int nMultBins = sizeof(multBin)/sizeof(multBin[0])-1;
     int nMomBins = sizeof(momBins)/sizeof(momBins[0])-1;
 
-    for(int m = 0; m < 4; m++) {
-        qVec[m] = new TProfile(names[m].Data(),"Q vector", nMultBins, multBin);
-        qVec[m]->Sumw2();
-
-        qVec2[m] = new TProfile((names[m]+"_no_mult").Data(),"Q vector", 1, 0, 100);
-        qVec2[m]->Sumw2();
-    }
-
     dirFlow2 = new TProfile("dirFlow_no_mult","dir flow", nMomBins, momBins);
     dirFlow2BKG= new TProfile("dirFlow_no_mult_BKG","dir flow _BKG", nMomBins, momBins);
 
@@ -248,10 +240,6 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 
     const int nptBins = 3;
 
-    for(int m = 0; m < 4; m++) {
-        qVec[m]->Write();
-        qVec2[m]->Write();
-    }
     refFlow->Write();
     dirFlow2->Write();
     refFlow2->Write();
