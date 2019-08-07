@@ -286,11 +286,14 @@ void StPicoD0V2AnaMaker::WriteHistograms() {
 // _________________________________________________________
 bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
 
+    //exclude candidate pairs - unlike sign pairs that have passed BDT cut
     std::vector<int> tracksToRemove = createCandidates();
 
+    //weights file is a distribution of phi of all charged hadrons
     double maxNentries = weights->GetMaximum();
     double weightHadron = 1;
 
+    //real and imaginary part of Q vector
     double QcosF[harmonics+1][3] = {0};
     double QcosB[harmonics+1][3] = {0};
     double QsinF[harmonics+1][3] = {0};
@@ -322,6 +325,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
         if(beta > 0) TOF->Fill(hadron->gMom().Perp(), 1/beta);
 
 
+        //only charged identified hadrons - kaons, pions, protons
         if(!mHFCuts->isGoodProton(hadron) && !mHFCuts->isGoodKaon(hadron) && !mHFCuts->isGoodPion(hadron)) continue;
         Ntracks++;
 
@@ -381,6 +385,7 @@ bool StPicoD0V2AnaMaker::getHadronCorV2(int idxGap) {
     if(NtracksB==0 || NtracksF==0)
         return false;
 
+    // !!! calculation of c_2{2}
     double c22 = ((QvectorB[2][1]*(TComplex::Conjugate(QvectorF[2][1])))/(QvectorB[0][1]*QvectorF[0][1])).Re();
     refFlow->Fill(mult, c22);
     refFlow2->Fill(mult, c22);
